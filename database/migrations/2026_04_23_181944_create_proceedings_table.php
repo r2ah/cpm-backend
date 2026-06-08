@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('proceedings', function (Blueprint $table) {
+            $table->id();
+
+            $table->dateTime('date');
+            $table->string('address'); //Lugar //TODO: Esto debe poder ser la ubicacion geografica donde se realiza la reunion.
+            $table->text('agenda'); //Orden del Dia
+            $table->text('approaches')->nullable(); //Intervenciones o planteamientos
+            $table->text('aggreements')->nullable(); //Acuerdos
+            $table->string('document_path')->nullable(); //Documento firmado
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('proceedings');
+    }
+};
