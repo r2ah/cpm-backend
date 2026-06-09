@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "861951bb6c43aef84f2cdc5b8838b30b",
+=======
+    "content-hash": "81f6ec51575c571c78d4eef2343ef58c",
+>>>>>>> 337c9e299c45ac1e3c79f4997ebba83dfb5ffb07
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3998,6 +4002,7 @@
             "time": "2025-12-14T04:43:48+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "spatie/laravel-package-tools",
             "version": "1.93.1",
             "source": {
@@ -4146,6 +4151,8 @@
             "time": "2026-05-30T19:30:22+00:00"
         },
         {
+=======
+>>>>>>> 337c9e299c45ac1e3c79f4997ebba83dfb5ffb07
             "name": "spomky-labs/cbor-php",
             "version": "3.2.3",
             "source": {

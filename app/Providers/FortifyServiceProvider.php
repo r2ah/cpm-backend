@@ -18,8 +18,6 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
 
-
-
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
@@ -70,6 +68,6 @@ class FortifyServiceProvider extends ServiceProvider
                 Hash::check($request->password, $user->password)) {
                 return $user;
             }
-   	});
+   	    });
     }
 }
