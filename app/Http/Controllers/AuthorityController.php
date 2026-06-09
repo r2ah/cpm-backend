@@ -3,32 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\Authority;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+use App\Http\Requests\AuthorityRequest;
+use App\Http\Resources\AuthorityResource;
 
 class AuthorityController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(AuthorityRequest $request) : JsonResponse
     {
-        //
+        // Pagination + simple filtering
+        $query = Authority::query();
+
+        if ($search = $request->query('search')) {
+            $query->where(fn($q) =>
+                $q->where('name', 'like', "%{$search}%")
+            );
+        }
+
+        $authorities = $query->latest()->paginate($request->integer('per_page', 10));
+
+	    return response()->json([
+            'success' => true,
+            'data' => AuthorityResource::collection($authorities)
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function store(AuthorityRequest $request) : JsonResponse
+    { 
+        $authority = Authority::create($request->validate());
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+	    return response()->json([
+            'success' => true,
+            'data' => new AuthorityResource($authority)
+        ], 201);
     }
 
     /**
@@ -36,30 +47,34 @@ class AuthorityController extends Controller
      */
     public function show(Authority $authority)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Authority $authority)
-    {
-        //
+	    return response()->json([
+            'success' => true,
+            'data' => new AuthorityResource($authority)
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Authority $authority)
+    public function update(AuthorityRequest $request, Authority $authority) : JsonResponse
     {
-        //
+	    $authority->update($request->validate());
+
+	    return response()->json([
+            'success' => true,
+            'data' => new AuthorityResource($authority)
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Authority $authority)
+    public function destroy(Authority $authority) : JsonResponse
     {
-        //
+	    $authority->delete();
+
+	    return response()->json([
+            'success' => true
+        ], 200);
     }
 }
