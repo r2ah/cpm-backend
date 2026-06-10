@@ -20,6 +20,10 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            $roles = $user->roles->pluck('name');
+
+            $permissions = $request->user()->getPermissionsViaRoles();
+
             return response()->json([
                 'message' => 'Login Successfully',
                 'access_token' => $token,
@@ -28,7 +32,9 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email
-                ]
+                ],
+                'roles' => $roles,
+                'permissions' => $permissions
             ], 200);
         }
 
@@ -39,6 +45,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
