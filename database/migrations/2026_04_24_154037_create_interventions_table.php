@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('interventions', function (Blueprint $table) {
             $table->id();
-
             $table->string('name', 255)->unique();
             $table->unsignedBigInteger('parent_id')->nullable();
-
             $table->timestamps();
 
             $table->foreign('parent_id')->references('id')->on('interventions');

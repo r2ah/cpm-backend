@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('people_proceedings', function (Blueprint $table) {
             $table->id();
-
-	    $table->unsignedBigInteger('person_id');
-	    $table->unsignedBigInteger('proceeding_id');
-
+            $table->unsignedBigInteger('person_id');
+            $table->unsignedBigInteger('proceeding_id');
             $table->timestamps();
         });
     }

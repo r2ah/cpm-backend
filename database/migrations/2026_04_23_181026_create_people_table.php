@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->id();
-
             $table->string('name', 255)->unique();
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->boolean('is_natural')->default(true);
-
             $table->timestamps();
         });
     }

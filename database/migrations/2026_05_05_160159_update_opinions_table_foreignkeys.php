@@ -12,48 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('opinions', function(Blueprint $table) {
-            $table->foreign('designer_id')
-		->references('id')
-		->on('people')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('investor_id')
-		->references('id')
-		->on('people')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('builder_id')
-		->references('id')
-		->on('people')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('issuing_company')
-		->references('id')
-		->on('authorities')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('prepared_by')
-		->references('id')
-		->on('users')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('reviewed_by')
-		->references('id')
-		->on('users')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-
-            $table->foreign('approved_by')
-		->references('id')
-		->on('users')
-		->onUpdate('cascade')
-		->onDelete('cascade');
-	});
+		});
     }
 
     /**

@@ -26,6 +26,6 @@ class Intervention extends Model
 
     public  function opinions(): BelongsToMany
     {
-        return $this->belongsToMany(Intervention::class);
+        return $this->belongsToMany(Opinion::class);
     }
 }

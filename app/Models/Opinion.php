@@ -30,7 +30,7 @@ class Opinion extends Model
 
 	public  function issuingCompany(): BelongsTo
 	{
-	  return $this->belongsTo(Person::class, 'issuing_company');
+	  return $this->belongsTo(Authority::class, 'issuing_company');
 	}
 
 	public  function preparedBy(): BelongsTo

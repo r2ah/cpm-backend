@@ -13,23 +13,21 @@ return new class extends Migration
     {
         Schema::create('intervention_opinion', function (Blueprint $table) {
             $table->id();
-
-	    $table->unsignedBigInteger('intervention_id');
-	    $table->unsignedBigInteger('opinion_id');
-
+            $table->unsignedBigInteger('intervention_id');
+            $table->unsignedBigInteger('opinion_id');
             $table->timestamps();
 
-	    $table->foreign('intervention_id')
-		->references('id')
-		->on('interventions')
-		->onUpdate('cascade')
-		->onDelete('cascade');
+            $table->foreign('intervention_id')
+                    ->references('id')
+                    ->on('interventions')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
 
-	    $table->foreign('opinion_id')
-		->references('id')
-		->on('opinions')
-		->onUpdate('cascade')
-		->onDelete('cascade');
+            $table->foreign('opinion_id')
+                    ->references('id')
+                    ->on('opinions')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
         });
     }
 
