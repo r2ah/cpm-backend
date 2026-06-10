@@ -5,15 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Authority;
 use Illuminate\Http\JsonResponse;
 
-use App\Http\Requests\AuthorityRequest;
+use Illuminate\Http\Request;
+use App\Http\Requests\AuthorityStoreRequest;
+use App\Http\Requests\AuthorityPutRequest;
 use App\Http\Resources\AuthorityResource;
+
+use Illuminate\Validation\ValidationException;
 
 class AuthorityController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(AuthorityRequest $request) : JsonResponse
+    public function index(Request $request) : JsonResponse
     {
         // Pagination + simple filtering
         $query = Authority::query();
@@ -24,21 +28,32 @@ class AuthorityController extends Controller
             );
         }
 
-        $authorities = $query->latest()->paginate($request->integer('per_page', 10));
+        if($request->query('all')) 
+            $items = $query->latest()->all();            
+        else 
+            $items = $query->latest()->paginate($request->integer('per_page', 10));
 
 	    return response()->json([
             'success' => true,
-            'data' => AuthorityResource::collection($authorities)
+            'data' => AuthorityResource::collection($items)
         ], 200);
     }
 
-    public function store(AuthorityRequest $request) : JsonResponse
+    public function store(AuthorityStoreRequest $request) : JsonResponse
     { 
-        $authority = Authority::create($request->validate());
+        try {
+            $validated = $request->validate();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } 
 
 	    return response()->json([
             'success' => true,
-            'data' => new AuthorityResource($authority)
+            'data' => new AuthorityResource(Authority::create($validated))
         ], 201);
     }
 
@@ -56,9 +71,20 @@ class AuthorityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AuthorityRequest $request, Authority $authority) : JsonResponse
+    public function update(AuthorityPutRequest $request, Authority $authority) : JsonResponse
     {
-	    $authority->update($request->validate());
+        try {
+            $validated = $request->validate();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } 
+
+	    $authority->update($validated);
 
 	    return response()->json([
             'success' => true,

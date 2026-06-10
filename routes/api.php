@@ -24,6 +24,11 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //TODO: Revisar esto
+    Route::get('user', function(Request $request){
+        return response()->json($request->user(), 200);
+    });
     
 	Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
         return Redirect::route('authorities.index');
