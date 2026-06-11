@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('entity'); //Entidad
             $table->string('address', 255);
-            //$table->magellanPolygon('location');
+            $table->geography('location', subtype: 'polygon', srid: 4326);
             $table->unsignedBigInteger('designer_id'); //Persona Natural o Juridica
             $table->unsignedBigInteger('investor_id'); //Persona Natural o Juridica
             $table->unsignedBigInteger('builder_id'); //Persona Natural o Juridica

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('date');
             $table->string('address', 255); //Lugar //TODO: Esto debe poder ser la ubicacion geografica donde se realiza la reunion.
-            //$table->magellanPolygon('location');            
+            $table->geography('location', subtype: 'polygon', srid: 4326);
             $table->text('agenda'); //Orden del Dia
             $table->text('approaches')->nullable(); //Intervenciones o planteamientos
             $table->text('aggreements')->nullable(); //Acuerdos
