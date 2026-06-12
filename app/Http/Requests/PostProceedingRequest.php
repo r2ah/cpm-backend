@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class AuthorityPutRequest extends FormRequest
+class PostProceedingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,7 @@ class AuthorityPutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')],
-            'email' => ['string', 'email', 'max:255']
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'name.unique' => __('Esta Autoridad ya existe.')
+            //
         ];
     }
 }

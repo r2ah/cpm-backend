@@ -6,8 +6,8 @@ use App\Models\Proceeding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-use App\Http\Requests\ProceedingStoreRequest;
-use App\Http\Requests\ProceedingPutRequest;
+use App\Http\Requests\StoreProceedingRequest;
+use App\Http\Requests\PostProceedingRequest;
 use App\Http\Resources\ProceedingResource;
 
 use Illuminate\Validation\ValidationException;
@@ -36,7 +36,7 @@ class ProceedingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProceedingStoreRequest $request) : JsonResponse
+    public function store(StoreProceedingRequest $request) : JsonResponse
     {
         try {
             $validated = $request->validate();
@@ -68,7 +68,7 @@ class ProceedingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProceedingPutRequest $request, Proceeding $proceeding) : JsonResponse
+    public function update(PostProceedingRequest $request, Proceeding $proceeding) : JsonResponse
     {
         try {
             $validated = $request->validate();

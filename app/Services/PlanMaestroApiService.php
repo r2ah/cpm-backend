@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Http;
 
 class PlanMaestroApiService
 {
-	protected $baseUrl;
-	protected $apiKey;
+	private string $baseUrl;
+	private string $apiKey;
 
 	public function __construct()
 	{

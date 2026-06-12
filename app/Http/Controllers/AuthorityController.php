@@ -6,8 +6,8 @@ use App\Models\Authority;
 use Illuminate\Http\JsonResponse;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\AuthorityStoreRequest;
-use App\Http\Requests\AuthorityPutRequest;
+use App\Http\Requests\StoreAuthorityRequest;
+use App\Http\Requests\PostAuthorityRequest;
 use App\Http\Resources\AuthorityResource;
 
 use Illuminate\Validation\ValidationException;
@@ -39,7 +39,7 @@ class AuthorityController extends Controller
         ], 200);
     }
 
-    public function store(AuthorityStoreRequest $request) : JsonResponse
+    public function store(StoreAuthorityRequest $request) : JsonResponse
     { 
         try {
             $validated = $request->validate();
@@ -71,7 +71,7 @@ class AuthorityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AuthorityPutRequest $request, Authority $authority) : JsonResponse
+    public function update(PostAuthorityRequest $request, Authority $authority) : JsonResponse
     {
         try {
             $validated = $request->validate();

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class InterventionPutRequest extends FormRequest
+class StoreProceedingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +24,7 @@ class InterventionPutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')]
+            //
         ];
     }
-
-    public function messages(): array
-    {
-        return [
-            'name.unique' => __('Este tipo de intervención ya existe.')
-        ];
-    }    
 }

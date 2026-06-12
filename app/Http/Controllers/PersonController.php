@@ -8,8 +8,8 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\PersonRequest;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\PersonStoreRequest;
-use App\Http\Requests\PersonPutRequest;
+use App\Http\Requests\StorePersonRequest;
+use App\Http\Requests\PostPersonRequest;
 use App\Http\Resources\PersonResource;
 
 use Illuminate\Validation\ValidationException;
@@ -44,7 +44,7 @@ class PersonController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PersonStoreRequest $request) : JsonResponse
+    public function store(StorePersonRequest $request) : JsonResponse
     {
         try {
             $validated = $request->validate();
@@ -76,7 +76,7 @@ class PersonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PersonPutRequest $request, Person $person) : JsonResponse
+    public function update(PostPersonRequest $request, Person $person) : JsonResponse
     {
         try {
             $validated = $request->validate();

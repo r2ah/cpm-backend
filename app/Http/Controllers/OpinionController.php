@@ -6,8 +6,8 @@ use App\Models\Opinion;
 use Illuminate\Http\JsonResponse;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\OpinionStoreRequest;
-use App\Http\Requests\OpinionPutRequest;
+use App\Http\Requests\StoreOpinionRequest;
+use App\Http\Requests\PostOpinionRequest;
 use App\Http\Resources\OpinionResource;
 
 use Illuminate\Validation\ValidationException;
@@ -36,7 +36,7 @@ class OpinionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(OpinionStoreRequest $request) : JsonResponse
+    public function store(StoreOpinionRequest $request) : JsonResponse
     {
         try {
             $validated = $request->validate();
@@ -68,7 +68,7 @@ class OpinionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(OpinionPutRequest $request, Opinion $opinion) : JsonResponse
+    public function update(PostOpinionRequest $request, Opinion $opinion) : JsonResponse
     {
         try {
             $validated = $request->validate();

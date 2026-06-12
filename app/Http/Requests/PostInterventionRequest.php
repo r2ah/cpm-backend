@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PersonStoreRequest extends FormRequest
+class PostInterventionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,14 @@ class PersonStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('intervention'), idColumn: 'id')],
-            'email' => ['string', 'email', 'max:255']
+            'name' => ['sometimes', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')]
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.unique' => __('Esta persona ya existe.')
+            'name.unique' => __('Este tipo de intervención ya existe.')
         ];
-    }
+    }    
 }

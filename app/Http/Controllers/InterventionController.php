@@ -6,8 +6,8 @@ use App\Models\Intervention;
 use Illuminate\Http\JsonResponse;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\InterventionStoreRequest;
-use App\Http\Requests\InterventionPutRequest;
+use App\Http\Requests\StoreInterventionRequest;
+use App\Http\Requests\PostInterventionRequest;
 use App\Http\Resources\InterventionResource;
 
 use Illuminate\Validation\ValidationException;
@@ -41,7 +41,7 @@ class InterventionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(InterventionStoreRequest $request) : JsonResponse
+    public function store(StoreInterventionRequest $request) : JsonResponse
     {
         try {
             $validated = $request->validate();
@@ -73,7 +73,7 @@ class InterventionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(InterventionPutRequest $request, Intervention $intervention) : JsonResponse
+    public function update(PostInterventionRequest $request, Intervention $intervention) : JsonResponse
     {
         try {
             $validated = $request->validate();

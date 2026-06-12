@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProceedingStoreRequest extends FormRequest
+class PostPersonRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,15 @@ class ProceedingStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'people', column: 'name')],
+            'email' => ['string', 'email', 'max:255']
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.unique' => __('Este persona ya existe.')
         ];
     }
 }
