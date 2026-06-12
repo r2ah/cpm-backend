@@ -11,6 +11,7 @@ use App\Http\Controllers\OpinionController;
 use App\Http\Controllers\InterventionController;
 use App\Http\Controllers\PlanMaestroApiController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaFileController;
 
 use App\Http\Controllers\Auth\AuthController;
 
@@ -53,4 +54,6 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 	Route::apiResource('users', UserController::class)->missing(function (Request $request) {
         return Redirect::route('users.index');
     });
+
+    Route::post('images/upload', [MediaFileController::class, 'store']);
 });
