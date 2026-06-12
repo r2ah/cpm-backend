@@ -19,8 +19,14 @@ return new class extends Migration
             $table->text('agenda'); //Orden del Dia
             $table->text('approaches')->nullable(); //Intervenciones o planteamientos
             $table->text('aggreements')->nullable(); //Acuerdos
-            $table->string('document_path')->nullable(); //Documento firmado
+            $table->unsignedBigInteger('signed_document')->nullable(); //Documento firmado
             $table->timestamps();
+
+            $table->foreign('signed_document')
+                    ->references('id')
+                    ->on('media_files')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');            
         });
     }
 
