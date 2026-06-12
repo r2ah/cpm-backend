@@ -5,8 +5,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
-use Spatie\LaravelImageOptimizer\Middlewares\OptimizeImages;
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -16,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
       	$middleware->statefulApi();
-        $middleware->append(\Spatie\LaravelImageOptimizer\Middlewares\OptimizeImages::class);
+        //$middleware->append(\Spatie\LaravelImageOptimizer\Middlewares\OptimizeImages::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
