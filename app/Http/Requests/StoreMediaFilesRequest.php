@@ -12,7 +12,7 @@ class StoreMediaFilesRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,8 @@ class StoreMediaFilesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'images' => ['bail', 'required', 'max:2048'],
+            'images.*' => ['bail', 'image', 'mimes:jpeg,jpg,png,gif,webp,pdf']
         ];
     }
 }
