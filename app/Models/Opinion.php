@@ -53,7 +53,7 @@ class Opinion extends Model
 	  return $this->belongsToMany(Intervention::class);
 	}
 
-	public  function mediaFiles(): BelongsToMany
+	public  function attachedFiles(): BelongsToMany
 	{
 	  return $this->belongsToMany(MediaFiles::class);
 	}	

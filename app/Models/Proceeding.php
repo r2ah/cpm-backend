@@ -12,8 +12,13 @@ class Proceeding extends Model
     /** @use HasFactory<\Database\Factories\ProceedingFactory> */
     use HasFactory;
 
-	public  function investor(): BelongsTo
+	public  function signedDocument(): BelongsTo
 	{
 	  return $this->belongsTo(MediaFiles::class, 'signed_document');
-	}    
+	} 
+	
+	public function participants()
+	{
+		return $this->belongsToMany(User::class, 'users_proceedings');
+	}
 }

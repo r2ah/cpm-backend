@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany(Opinion::class, 'approved_by');
     }
 
+    public function proceedings()
+    {
+        return $this->belongsToMany(Proceeding::class, 'users_proceedings');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
