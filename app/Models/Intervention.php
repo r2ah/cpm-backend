@@ -21,11 +21,11 @@ class Intervention extends Model
 
     public function childs(): HasMany
     {
-        return $this->hasMany(Intervention::class, 'parent_id');
+        return $this->hasMany(Intervention::class, 'parent_id')->with('childs');
     }
 
     public  function opinions(): BelongsToMany
     {
-        return $this->belongsToMany(Opinion::class);
+        return $this->belongsToMany(Opinion::class, 'intervention_opinion');
     }
 }

@@ -60,7 +60,7 @@ class AuthorityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Authority $authority)
+    public function show(Authority $authority) : JsonResponse
     {
 	    return response()->json([
             'success' => true,

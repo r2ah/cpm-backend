@@ -18,7 +18,7 @@ class InterventionFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => "Uso del Espacio Público", 'parent' => null
+            'name' => "Uso del Espacio Público", 'parent_id' => null
         ];
     }
 }

@@ -79,6 +79,26 @@ class User extends Authenticatable
         return $this->belongsToMany(Proceeding::class, 'users_proceedings');
     }
 
+    public function commissions()
+    {
+        return $this->belongsToMany(Commission::class, 'users_commisions');
+    }
+
+    public function opinionsStatus(): HasMany
+    {
+        return $this->belongsToMany(Opinion::class, 'historical_opinion_states');
+    }
+ 
+    public function commissionsSignedTo(): HasMany
+    {
+        return $this->hasMany(Commission::class, 'signed_to');
+    }
+
+    public function commissionsAttendedBy(): HasMany
+    {
+        return $this->hasMany(Commission::class, 'attended_by');
+    }    
+
     /**
      * Get the attributes that should be cast.
      *

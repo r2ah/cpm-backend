@@ -16,22 +16,22 @@ class InterventionSeeder extends Seeder
     {
         $parent = Intervention::create([
             'name' => 'Uso del Espacio Público',
-            'parent' => null
+            'parent_id' => null
         ]);
 
         Intervention::create([
             'name' => 'Vallas Publicitarias',
-            'parent' => $parent->id
+            'parent_id' => $parent->id
         ]);
 
         Intervention::create([
             'name' => 'Mobiliario Urbano',
-            'parent' => $parent->id
+            'parent_id' => $parent->id
         ]);
 
         Intervention::create([
             'name' => 'Otros',
-            'parent' => $parent->id
+            'parent_id' => $parent->id
         ]);
     }
 }
