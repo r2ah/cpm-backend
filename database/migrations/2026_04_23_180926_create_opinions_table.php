@@ -16,63 +16,22 @@ return new class extends Migration
             $table->unsignedBigInteger('entity'); //Entidad
             $table->string('address', 255);
             $table->geography('location', subtype: 'polygon', srid: 4326);
-            $table->unsignedBigInteger('designer_id'); //Persona Natural o Juridica
-            $table->unsignedBigInteger('investor_id'); //Persona Natural o Juridica
-            $table->unsignedBigInteger('builder_id'); //Persona Natural o Juridica
+            $table->foreign('designer_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+            $table->foreign('investor_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+            $table->foreign('builder_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
             $table->text('general_characteristics')->nullable();
-            $table->unsignedBigInteger('issuing_company'); //Autoridad que emite la Incripcion
+            $table->foreign('issuing_company')->references('id')->on('authorities')->onDelete('cascade');  //Autoridad que emite la Incripcion
+            $table->unsignedBigInteger('issuing_company');
             $table->enum('issuing_document_code', ['DUS', 'DO', 'Micro']); //TODO: Valorar si debe ser un nomenclador
             $table->text('considerations')->nullable();
             $table->text('observations')->nullable();
             $table->enum('state', ['Elaborado', 'Revisado', 'Aprobado', 'Denegado'])->default('Elaborado');
             $table->dateTime('date');
-            $table->unsignedBigInteger('prepared_by'); //Usuario del Sistema
-            $table->unsignedBigInteger('reviewed_by')->nullable(); //Usuario del Sistema
-            $table->unsignedBigInteger('approved_by')->nullable(); //Usuario del Sistema
+            $table->foreign('commission_id')->references('id')->on('commissions')->onDelete('cascade');
+            $table->foreign('prepared_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
+            $table->foreign('reviewed_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
+            $table->foreign('approved_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
             $table->timestamps();
-
-            $table->foreign('designer_id')
-                    ->references('id')
-                    ->on('people')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade');
-
-            $table->foreign('investor_id')
-					->references('id')
-					->on('people')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
-            $table->foreign('builder_id')
-					->references('id')
-					->on('people')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
-            $table->foreign('issuing_company')
-					->references('id')
-					->on('authorities')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
-            $table->foreign('prepared_by')
-					->references('id')
-					->on('users')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
-            $table->foreign('reviewed_by')
-					->references('id')
-					->on('users')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
-            $table->foreign('approved_by')
-					->references('id')
-					->on('users')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-
         });
     }
 

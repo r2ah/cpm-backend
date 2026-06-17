@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('historical_opinion_states', function (Blueprint $table) {
+        Schema::create('oponion_media_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('opinion_id')->constrained('opinions')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->dateTime('date');
-            $table->enum('state', ['Elaborado', 'Revisado', 'Aprobado', 'Denegado'])->default('Elaborado');            
+            $table->foreignId('mediafile_id')->constrained('media_files')->onDelete('cascade');
+            $table->unsignedBigInteger('opinion_id');
+            $table->unsignedBigInteger('mediafile_id');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('historical_opinion_states');
+        Schema::dropIfExists('oponion_media_files');
     }
 };

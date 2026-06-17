@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('face2face_commision_requests', function (Blueprint $table) {
+        Schema::create('users_commissions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('commission_id');
-            //TODO: Pendiente el resto de los datos que publica el servicio de solicitudes
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('commission_id')->constrained('commissions')->onDelete('cascade');
-            $table->foreignId('signed_to')->constrained('users')->onDelete('cascade');
-            $table->foreignId('attended_by')->constrained('users')->onDelete('cascade');
-            $table->dateTime('date');
+            $table->enum('position', ['Especialista', 'Secretario(a) Ejecutivo(a)', 'Presidente(a)'])->default('Especialista'); //TODO: Valorar si debe ser un nomenclador
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('face2face_commision_requests');
+        Schema::dropIfExists('users_commissions');
     }
 };
