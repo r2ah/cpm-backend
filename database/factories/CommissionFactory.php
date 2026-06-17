@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Commission;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +18,16 @@ class CommissionFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            //
-        ];
+        $commission = Commission::factory()
+            ->has(User::factory(3), 'members')
+            ->create([
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'level' => fake()->randomElement(['Nacional', 'Provincial', 'Municipal', 'Local']),
+            'region' => fake()->latitude() . ',' . fake()->longitude(),
+            'parent_id' => null
+        ]);
+
+        return $commission->toArray();
     }
 }
