@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PostProceedingRequest extends FormRequest
+class UpdateInterventionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,14 @@ class PostProceedingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['sometimes', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')]
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'name.unique' => __('Este tipo de intervención ya existe.')
+        ];
+    }    
 }

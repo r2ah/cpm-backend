@@ -4,16 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 
-use App\Http\Controllers\AuthorityController;
-use App\Http\Controllers\PersonController;
-use App\Http\Controllers\ProceedingController;
-use App\Http\Controllers\OpinionController;
-use App\Http\Controllers\InterventionController;
-use App\Http\Controllers\PlanMaestroApiController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\MediaFileController;
-
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\AuthorityController;
+use App\Http\Controllers\CommissionController;
+use App\Http\Controllers\InterventionController;
+use App\Http\Controllers\MediaFileController;
+use App\Http\Controllers\OpinionController;
+use App\Http\Controllers\PersonController;
+use App\Http\Controllers\PlanMaestroApiController;
+use App\Http\Controllers\ProceedingController;
+use App\Http\Controllers\UserController;
 
 Route::prefix('v1/plan-maestro')->group(function () {
     Route::get('/', [PlanMaestroApiController::class, 'index']);
@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         return response()->json($request->user(), 200);
     });
     
-	Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
+    Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
         return Redirect::route('authorities.index');
     });
 
@@ -50,6 +50,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 	Route::apiResource('interventions', InterventionController::class)->missing(function (Request $request) {
         return Redirect::route('interventions.index');
     });
+
+    Route::apiResource('commissions', CommissionController::class)->missing(function (Request $request) {
+        return Redirect::route('commissions.index');
+    });    
 
 	Route::apiResource('users', UserController::class)->missing(function (Request $request) {
         return Redirect::route('users.index');

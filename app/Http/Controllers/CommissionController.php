@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCommissionRequest;
-use App\Http\Requests\UpdateCommissionRequest;
 use App\Models\Commission;
 
 use Illuminate\Http\JsonResponse;
