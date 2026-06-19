@@ -32,3 +32,17 @@ test('users can not authenticate with invalid password', function () {
 
     $this->assertGuest();
 });
+
+it('requires authentication for dashboard', function () {
+    $response = $this->get('/users');
+
+    $response->assertRedirect('/login');
+});
+
+it('allows authenticated users to get user list', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/users');
+
+    $response->assertOk();
+});
