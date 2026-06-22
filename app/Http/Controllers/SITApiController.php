@@ -9,8 +9,6 @@ use App\Services\SITApiService;
 
 class SITApiController extends Controller
 {
-    protected SITApiService $sitApiService;
-
     public function __construct(
         private SITApiService $sitApiService
     ) {}
