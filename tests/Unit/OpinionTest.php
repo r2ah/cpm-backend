@@ -3,7 +3,7 @@
 use App\Models\Opinion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('does not create a opinion without a name field', function () {
     $response = $this->postJson('/api/opinions', []);

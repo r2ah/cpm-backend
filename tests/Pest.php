@@ -52,7 +52,7 @@ expect()->extend('toBeValidEmail', function () {
 
 use Illuminate\Support\Facades\Validator;
 
-uses(Tests\TestCase::class)->in('Feature');
+//uses(Tests\TestCase::class)->in('Feature');
 uses(Tests\TestCase::class)->in('Unit');
 
 function createRequest($class, $requestBody){
