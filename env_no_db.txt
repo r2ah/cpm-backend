@@ -1,0 +1,65 @@
+.env:APP_NAME=Laravel
+.env:APP_ENV=local
+.env:APP_KEY=
+.env:APP_DEBUG=true
+.env:APP_URL=http://localhost
+.env:
+.env:APP_LOCALE=en
+.env:APP_FALLBACK_LOCALE=en
+.env:APP_FAKER_LOCALE=en_US
+.env:
+.env:APP_MAINTENANCE_DRIVER=file
+.env:# APP_MAINTENANCE_STORE=database
+.env:
+.env:# PHP_CLI_SERVER_WORKERS=4
+.env:
+.env:BCRYPT_ROUNDS=12
+.env:
+.env:LOG_CHANNEL=stack
+.env:LOG_STACK=single
+.env:LOG_DEPRECATIONS_CHANNEL=null
+.env:LOG_LEVEL=debug
+.env:
+.env:DB_CONNECTION=sqlite
+.env:# DB_HOST=127.0.0.1
+.env:# DB_PORT=3306
+.env:# DB_DATABASE=laravel
+.env:# DB_USERNAME=root
+.env:# DB_PASSWORD=
+.env:
+.env:SESSION_DRIVER=database
+.env:SESSION_LIFETIME=120
+.env:SESSION_ENCRYPT=false
+.env:SESSION_PATH=/
+.env:SESSION_DOMAIN=null
+.env:
+.env:BROADCAST_CONNECTION=log
+.env:FILESYSTEM_DISK=local
+.env:QUEUE_CONNECTION=database
+.env:
+.env:CACHE_STORE=database
+.env:# CACHE_PREFIX=
+.env:
+.env:MEMCACHED_HOST=127.0.0.1
+.env:
+.env:REDIS_CLIENT=phpredis
+.env:REDIS_HOST=127.0.0.1
+.env:REDIS_PASSWORD=null
+.env:REDIS_PORT=6379
+.env:
+.env:MAIL_MAILER=log
+.env:MAIL_SCHEME=null
+.env:MAIL_HOST=127.0.0.1
+.env:MAIL_PORT=2525
+.env:MAIL_USERNAME=null
+.env:MAIL_PASSWORD=null
+.env:MAIL_FROM_ADDRESS="hello@example.com"
+.env:MAIL_FROM_NAME="${APP_NAME}"
+.env:
+.env:AWS_ACCESS_KEY_ID=
+.env:AWS_SECRET_ACCESS_KEY=
+.env:AWS_DEFAULT_REGION=us-east-1
+.env:AWS_BUCKET=
+.env:AWS_USE_PATH_STYLE_ENDPOINT=false
+.env:
+.env:VITE_APP_NAME="${APP_NAME}"
