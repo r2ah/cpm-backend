@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('face2face_commision_requests', function (Blueprint $table) {
+            $table->id();
+            //TODO: Pendiente el resto de los datos que publica el servicio de solicitudes
+            $table->foreignId('commission_id')->constrained('commissions')->onDelete('cascade');
+            $table->foreignId('signed_to')->constrained('users')->onDelete('cascade');
+            $table->foreignId('attended_by')->constrained('users')->onDelete('cascade');
+            $table->dateTime('date');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('face2face_commision_requests');
+    }
+};
