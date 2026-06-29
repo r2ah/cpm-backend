@@ -11,6 +11,13 @@ class Person extends Model
     /** @use HasFactory<\Database\Factories\PersonFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'is_natural',
+    ];
+
     public function designerOpinions(): HasMany
     {
         return $this->hasMany(Opinion::class, 'designer');

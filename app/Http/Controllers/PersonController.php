@@ -46,17 +46,11 @@ class PersonController extends Controller
      */
     public function store(StorePersonRequest $request) : JsonResponse
     {
-        try {
-            $validated = $request->validate();
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } 
+        // StorePersonRequest ya valida automáticamente.
+        // Si falla, Laravel devuelve 422 antes de llegar aquí.
+        $validated = $request->validated();
 
-	    return response()->json([
+        return response()->json([
             'success' => true,
             'data' => new PersonResource(Person::create($validated))
         ], 201);
@@ -79,7 +73,7 @@ class PersonController extends Controller
     public function update(UpdatePersonRequest $request, Person $person) : JsonResponse
     {
         try {
-            $validated = $request->validate();
+            $validated = $request->validated();
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

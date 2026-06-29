@@ -21,13 +21,19 @@ class UpdatePersonRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'people', column: 'name')],
-            'email' => ['string', 'email', 'max:255']
-        ];
-    }
+   public function rules(): array
+{
+    return [
+        'name' => [
+            'required',
+            'string',
+            'min:3',
+            'max:100',
+            Rule::unique('people', 'name')->ignore($this->route('person')),
+        ],
+        'email' => ['string', 'email', 'max:255']
+    ];
+}
 
     public function messages(): array
     {

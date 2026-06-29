@@ -56,7 +56,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $appends = [
-        'profile_photo_url',
+        //'profile_photo_url',
     ];
 
     public function opinionsPreparedBy(): HasMany

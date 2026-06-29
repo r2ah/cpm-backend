@@ -28,7 +28,7 @@ class InterventionController extends Controller
         }
 
         if($request->query('all')) 
-            $items = $query->latest()->all();            
+            $items = $query->latest()->get();           
         else 
             $items = $query->latest()->paginate($request->integer('per_page', 10));
 
