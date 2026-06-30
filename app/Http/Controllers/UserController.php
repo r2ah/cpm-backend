@@ -10,6 +10,7 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Actions\Fortify\PasswordValidationRules;
 
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,44 +25,43 @@ class UserController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request) : JsonResponse
-    {
+{
+    $users = User::latest()->get();
 
-    }
+    return response()->json([
+        'success' => true,
+        'data' => UserResource::collection($users)
+    ]);
+}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UserRequest $request) : JsonResponse
-    {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|min:6',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        }         
-    
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+ 
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+public function store(UserRequest $request)
+{
+    $validated = $request->validated();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User Registered Successfully',
-            'token' => $token,
-            'user' => $user
-        ], 201);
-    }
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        'phone' => $validated['phone'] ?? null,
+    ]);
+
+    if (!empty($validated['role'])) {
+    $user->syncRoles([$validated['role']]);
+     }
+
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'success' => true,
+        'data' => new UserResource($user),
+        'token' => $token
+    ], 201);
+}
 
     /**
      * Display the specified resource.
@@ -77,26 +77,30 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, User $user) : JsonResponse
-    {
-       try {
-            $validated = $request->validate();
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } 
+   public function update(UserRequest $request, User $user)
+{
+    $validated = $request->validated();
 
-	    $user->update($validated);
+    $user->update([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'phone' => $validated['phone'] ?? null,
+    ]);
 
-	    return response()->json([
-            'success' => true,
-            'data' => new UserResource($user)
-        ], 200);
+    if (!empty($validated['password'])) {
+        $user->password = Hash::make($validated['password']);
+        $user->save();
     }
 
+    if (!empty($validated['role'])) {
+    $user->syncRoles([$validated['role']]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => new UserResource($user)
+    ]);
+}
     /**
      * Remove the specified resource from storage.
      */
