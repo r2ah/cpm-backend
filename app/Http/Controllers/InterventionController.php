@@ -16,27 +16,23 @@ class InterventionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) : JsonResponse
-    {
-        // Pagination + simple filtering
-        $query = Intervention::query();
+    public function index(Request $request): JsonResponse
+{
+    $query = Intervention::query();
 
-        if ($search = $request->query('search')) {
-            $query->where(fn($q) =>
-                $q->where('name', 'like', "%{$search}%")
-            );
-        }
-
-        if($request->query('all')) 
-            $items = $query->latest()->get();           
-        else 
-            $items = $query->latest()->paginate($request->integer('per_page', 10));
-
-	    return response()->json([
-            'success' => true,
-            'data' => InterventionResource::collection($items)
-        ], 200);
+    if ($search = $request->query('search')) {
+        $query->where('name', 'like', "%{$search}%");
     }
+
+    $items = $request->query('all')
+        ? $query->latest()->get()
+        : $query->latest()->paginate($request->integer('per_page', 10));
+
+    return response()->json([
+        'success' => true,
+        'data' => InterventionResource::collection($items)
+    ]);
+}
 
     /**
      * Store a newly created resource in storage.
@@ -44,7 +40,7 @@ class InterventionController extends Controller
     public function store(StoreInterventionRequest $request) : JsonResponse
     {
         try {
-            $validated = $request->validate();
+            $validated = $request->validated();
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -76,7 +72,7 @@ class InterventionController extends Controller
     public function update(UpdateInterventionRequest $request, Intervention $intervention) : JsonResponse
     {
         try {
-            $validated = $request->validate();
+            $validated = $request->validated();
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

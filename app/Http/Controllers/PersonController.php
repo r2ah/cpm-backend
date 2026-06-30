@@ -31,7 +31,7 @@ class PersonController extends Controller
         }
 
         if($request->query('all')) 
-            $items = $query->latest()->all();            
+            $items = $query->latest()->get();           
         else 
             $items = $query->latest()->paginate($request->integer('per_page', 10));
 
@@ -44,17 +44,19 @@ class PersonController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePersonRequest $request) : JsonResponse
-    {
-        // StorePersonRequest ya valida automáticamente.
-        // Si falla, Laravel devuelve 422 antes de llegar aquí.
-        $validated = $request->validated();
+    public function store(StorePersonRequest $request): JsonResponse
+{
+    $validated = $request->validated();
 
-        return response()->json([
-            'success' => true,
-            'data' => new PersonResource(Person::create($validated))
-        ], 201);
-    }
+    $validated['is_natural_person'] = $request->boolean('is_natural_person');
+
+    $person = Person::create($validated);
+
+    return response()->json([
+        'success' => true,
+        'data' => new PersonResource($person)
+    ], 201);
+}
 
     /**
      * Display the specified resource.
@@ -70,26 +72,31 @@ class PersonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePersonRequest $request, Person $person) : JsonResponse
-    {
-        try {
-            $validated = $request->validated();
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } 
-
-	    $person->update($validated);
-
-	    return response()->json([
-            'success' => true,
-            'data' => new PersonResource($person)
-        ], 200);
+    public function update(UpdatePersonRequest $request, Person $person): JsonResponse
+{
+    try {
+        $validated = $request->validated();
+    } catch (ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
     }
+
+    // 🔥 FIX CRÍTICO
+   $isNatural = $request->boolean('is_natural_person');
+
+$person->update([
+    ...$validated,
+    'is_natural_person' => $isNatural,
+]);
+
+    return response()->json([
+        'success' => true,
+        'data' => new PersonResource($person)
+    ], 200);
+}
 
     /**
      * Remove the specified resource from storage.

@@ -12,11 +12,11 @@ class Person extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'is_natural',
-    ];
+    'name',
+    'email',
+    'phone',
+    'is_natural_person',
+];
 
     public function designerOpinions(): HasMany
     {
