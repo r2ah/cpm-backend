@@ -15,13 +15,14 @@ use App\Http\Controllers\SITApiController;
 use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
 
-Route::prefix('v1/plan-maestro')->group(function () {
-    Route::get('/', [SITApiController::class, 'index']);
-    Route::get('/entities', [SITApiController::class, 'getEntities']);
-    Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
-});
+Route::prefix('v1')->group(function () {
+	Route::prefix('plan-maestro')->group(function () {
+	    Route::get('/', [SITApiController::class, 'index']);
+	    Route::get('/entities', [SITApiController::class, 'getEntities']);
+	    Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
+	});
 
-Route::post('/login', [AuthController::class, 'login']);
+	Route::post('/login', [AuthController::class, 'login']);
 
     Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
         return Redirect::route('authorities.index');
@@ -53,12 +54,16 @@ Route::post('/login', [AuthController::class, 'login']);
 
     Route::post('images/upload', [MediaFileController::class, 'store']);
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //TODO: Revisar esto
     Route::get('user', function(Request $request){
         return response()->json($request->user(), 200);
     });
+
+});
+
+
     
 });

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AuthorityResource extends JsonResource
+class CommissionResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -13,7 +13,7 @@ class AuthorityResource extends JsonResource
             'name'      => $this->name,
             'email'     => $this->email,
             'level'     => $this->level,
-            'region'    => $this->region,
+//            'region'    => $this->region,
             'parent'    => [
                 'id'    => $this->parent?->id,
                 'name'  => $this->parent?->name,
