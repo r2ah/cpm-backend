@@ -23,8 +23,22 @@ class StoreProceedingRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Evitamos comportamientos raros en el registrador de validación.
+        // Define reglas mínimas para que la validación sea efectiva y no dispare errores
+        // por firmas internas.
         return [
-            //
+            'date' => ['required', 'string'],
+            'address' => ['required', 'string'],
+            'agenda' => ['nullable', 'string'],
+
+
+            'approaches' => ['nullable', 'string'],
+            'aggreements' => ['nullable', 'string'],
+            'commission_id' => ['required', 'integer'],
+            'signed_document' => ['nullable', 'integer'],
+            'participants' => ['nullable','array'],
+            'participants.*' => ['exists:users,id'],
         ];
     }
+
 }

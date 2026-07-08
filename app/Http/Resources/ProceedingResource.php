@@ -9,7 +9,31 @@ class ProceedingResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'        => $this->id,
+            'id' => $this->id,
+
+            'date' => $this->date,
+            'address' => $this->address,
+            'agenda' => $this->agenda,
+            'approaches' => $this->approaches,
+            'aggreements' => $this->aggreements,
+
+            'commission_id' => $this->commission_id,
+
+            'signed_document' => $this->signed_document,
+
+            'participants' => $this->whenLoaded(
+                'participants',
+                function () {
+                    return $this->participants->map(function ($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'email' => $user->email,
+                        ];
+                    });
+                }
+            ),
+
             'createdAt' => $this->created_at?->toIso8601String(),
             'updatedAt' => $this->updated_at?->toIso8601String(),
         ];

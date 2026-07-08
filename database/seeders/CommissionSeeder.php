@@ -13,21 +13,25 @@ class CommissionSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-    {
-        $commision = Commission::create([
-            'name' => 'Comisión Nacional de Monumentos',
-            'email' => 'info@monumentos.com',
-            'level' => 'Nacional',
-            'region' => null,
-            'parent_id' => null
-        ]);
+{
+    $parent = Commission::updateOrCreate(
+    ['email' => 'info@monumentos.com'],
+    [
+        'name' => 'Comisión Nacional de Monumentos',
+        'level' => 'Nacional',
+        'region' => null,
+        'parent_id' => null
+    ]
+);
 
-        $commision = Commission::create([
-            'name' => 'Comisión Provincial de Monumentos',
-            'email' => 'info@monumentos.com',
-            'level' => 'Provincial',
-            'region' => null,
-            'parent_id' => $commision
-        ]);
-    }
+Commission::updateOrCreate(
+    ['email' => 'info@provincial.com'],
+    [
+        'name' => 'Comisión Provincial de Monumentos',
+        'level' => 'Provincial',
+        'region' => null,
+        'parent_id' => $parent->id
+    ]
+);
+}
 }

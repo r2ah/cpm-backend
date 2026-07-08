@@ -14,7 +14,7 @@ class UserResource extends JsonResource
         'email' => $this->email,
         'phone' => $this->phone,
 
-        // 🔥 SPATIE ROLES
+        
         'roles' => $this->getRoleNames(),
 
         'createdAt' => $this->created_at?->toIso8601String(),

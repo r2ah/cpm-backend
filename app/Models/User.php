@@ -6,26 +6,21 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-//use Laravel\Jetstream\HasProfilePhoto;
-// use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasApiTokens;
-
-    /** @use HasFactory<UserFactory> */
     use HasFactory;
-
-    //use HasProfilePhoto;
-    // use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+
 
     /**
      * The attributes that are mass assignable.
@@ -33,13 +28,16 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'phone',
-    
-];
+        'name',
+        'email',
+        'password',
+        'phone',
+    ];
+
+
     protected $guard_name = 'api';
+
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -52,60 +50,146 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = [
-        //'profile_photo_url',
+        //
     ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OPINIONS
+    |--------------------------------------------------------------------------
+    */
+
 
     public function opinionsPreparedBy(): HasMany
     {
-        return $this->hasMany(Opinion::class, 'prepared_by');        
+        return $this->hasMany(
+            Opinion::class,
+            'prepared_by'
+        );
     }
+
 
     public function opinionsReviewedBy(): HasMany
     {
-        return $this->hasMany(Opinion::class, 'reviewed_by');
+        return $this->hasMany(
+            Opinion::class,
+            'reviewed_by'
+        );
     }
+
 
     public function opinionsApprovedBy(): HasMany
     {
-        return $this->hasMany(Opinion::class, 'approved_by');
+        return $this->hasMany(
+            Opinion::class,
+            'approved_by'
+        );
     }
 
-    public function proceedings()
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROCEEDINGS (ACTAS)
+    |--------------------------------------------------------------------------
+    */
+
+
+    /**
+     * Actas donde el usuario participa.
+     */
+    public function proceedings(): BelongsToMany
     {
-        return $this->belongsToMany(Proceeding::class, 'users_proceedings');
+        return $this->belongsToMany(
+            Proceeding::class,
+            'users_proceedings',
+            'user_id',
+            'proceeding_id'
+        );
     }
 
-    public function commissions()
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMMISSIONS
+    |--------------------------------------------------------------------------
+    */
+
+
+    /**
+     * Comisiones donde participa el usuario.
+     */
+    public function commissions(): BelongsToMany
     {
-        return $this->belongsToMany(Commission::class, 'users_commisions');
+        return $this->belongsToMany(
+            Commission::class,
+            'users_commissions',
+            'user_id',
+            'commission_id'
+        );
     }
 
-    public function opinionsStatus(): HasMany
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OPINION STATUS HISTORY
+    |--------------------------------------------------------------------------
+    */
+
+
+    public function opinionsStatus(): BelongsToMany
     {
-        return $this->belongsToMany(Opinion::class, 'historical_opinion_states');
+        return $this->belongsToMany(
+            Opinion::class,
+            'historical_opinion_states'
+        );
     }
- 
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMMISSION SIGNATURE / ATTENDANCE
+    |--------------------------------------------------------------------------
+    */
+
+
     public function commissionsSignedTo(): HasMany
     {
-        return $this->hasMany(Commission::class, 'signed_to');
+        return $this->hasMany(
+            Commission::class,
+            'signed_to'
+        );
     }
+
 
     public function commissionsAttendedBy(): HasMany
     {
-        return $this->hasMany(Commission::class, 'attended_by');
-    }    
+        return $this->hasMany(
+            Commission::class,
+            'attended_by'
+        );
+    }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CASTS
+    |--------------------------------------------------------------------------
+    */
+
+
     protected function casts(): array
     {
         return [

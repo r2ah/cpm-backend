@@ -24,7 +24,14 @@ class UpdateProceedingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'date' => ['required', 'string'],
+            'address' => ['required', 'string'],
+            'agenda' => ['nullable', 'string'],
+            'approaches' => ['nullable', 'string'],
+            'aggreements' => ['nullable', 'string'],
+            'commission_id' => ['required', 'integer'],
+            'signed_document' => ['nullable', 'integer'],
         ];
+
     }
 }
