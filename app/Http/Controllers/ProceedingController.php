@@ -49,55 +49,28 @@ class ProceedingController extends Controller
      * Store a newly created resource.
      */
     public function store(StoreProceedingRequest $request): JsonResponse
-    {
-        try {
+{
+    $validated = $request->validated();
 
-            $validated = $request->validated();
-
-        } catch (ValidationException $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        }
+    $proceeding = Proceeding::create($validated);
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Crear Acta
-        |--------------------------------------------------------------------------
-        */
+    if ($request->filled('participants')) {
 
-        $proceeding = Proceeding::create($validated);
+        $proceeding->participants()
+            ->attach($request->participants);
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Asignar participantes
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->has('participants')) {
-
-            $proceeding
-                ->participants()
-                ->attach(
-                    $request->participants
-                );
-        }
-
-
-
-        return response()->json([
-            'success' => true,
-            'data' => new ProceedingResource(
-                $proceeding->load('participants')
-            )
-        ], 201);
     }
+
+
+    $proceeding->load('participants');
+
+
+    return response()->json([
+        'success' => true,
+        'data' => $proceeding
+    ], 201);
+}
 
 
 
