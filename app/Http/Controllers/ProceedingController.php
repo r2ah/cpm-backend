@@ -77,106 +77,90 @@ class ProceedingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Proceeding $proceeding): JsonResponse
-    {
+    public function show($id): JsonResponse
+{
+    $proceeding = Proceeding::with('participants')
+        ->find($id);
+
+
+    if (!$proceeding) {
+
         return response()->json([
-            'success' => true,
-            'data' => new ProceedingResource(
-                $proceeding->load('participants')
-            )
-        ], 200);
+            'success'=>false,
+            'message'=>'Acta no encontrada',
+            'id recibido'=>$id
+        ],404);
+
     }
+
+
+    return response()->json([
+        'success'=>true,
+        'data'=>new ProceedingResource($proceeding)
+    ]);
+}
 
 
 
     /**
      * Update the specified resource.
      */
-    public function update(
-        UpdateProceedingRequest $request,
-        Proceeding $proceeding
-    ): JsonResponse
-    {
-
-        try {
-
-            $validated = $request->validated();
-
-        } catch (ValidationException $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ],422);
-        }
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Actualizar datos del acta
-        |--------------------------------------------------------------------------
-        */
-
-        $proceeding->update($validated);
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Actualizar participantes
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->has('participants')) {
-
-            $proceeding
-                ->participants()
-                ->sync(
-                    $request->participants
-                );
-        }
-
-
-
-        return response()->json([
-            'success' => true,
-            'data' => new ProceedingResource(
-                $proceeding->load('participants')
-            )
-        ],200);
-    }
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) : JsonResponse
+   public function update(
+    UpdateProceedingRequest $request,
+    $id
+): JsonResponse
 {
+
     $proceeding = Proceeding::find($id);
 
 
     if (!$proceeding) {
+
         return response()->json([
-            'success' => false,
-            'message' => 'Acta no encontrada'
-        ], 404);
+            'success'=>false,
+            'message'=>'Acta no encontrada'
+        ],404);
+
     }
 
 
-    // eliminar relaciones con usuarios
-    $proceeding->participants()->detach();
+    $validated = $request->validated();
 
 
-    // eliminar acta
-    $proceeding->delete();
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar datos del acta
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding->update($validated);
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar participantes
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->has('participants')) {
+
+        $proceeding
+            ->participants()
+            ->sync(
+                $request->participants ?? []
+            );
+
+    }
+
 
 
     return response()->json([
-        'success' => true,
-        'message' => 'Acta eliminada correctamente'
-    ], 200);
+        'success'=>true,
+        'data'=>new ProceedingResource(
+            $proceeding->fresh()->load('participants')
+        )
+    ],200);
+
 }
 }

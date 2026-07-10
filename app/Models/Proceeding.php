@@ -39,14 +39,14 @@ class Proceeding extends Model
      * Usuarios participantes del acta
      */
     public function participants(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            User::class,
-            'users_proceedings',
-            'proceeding_id',
-            'user_id'
-        );
-    }
+{
+    return $this->belongsToMany(
+        User::class,
+        'users_proceedings',
+        'proceeding_id',
+        'user_id'
+    )->withTimestamps();
+}
 
 
     /**
