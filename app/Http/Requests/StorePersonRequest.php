@@ -24,8 +24,10 @@ class StorePersonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('intervention'), idColumn: 'id')],
-            'email' => ['string', 'email', 'max:255']
+            'name' => ['required', 'string', 'min:3', 'max:100', 'unique:people,name'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:people,email'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'is_natural' => ['nullable', 'boolean'],
         ];
     }
 

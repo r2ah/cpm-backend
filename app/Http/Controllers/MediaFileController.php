@@ -23,49 +23,32 @@ class MediaFileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMediaFilesRequest $request) : JsonResponse
-    {
-        $file_details = [];
-
-        //check if request has files
-        if ($request->hasFile('files')) {
-          // loop through each file and upload it
-
-            foreach ($request->file('files') as $key => $file) {
-                try {
-                    // Validate file
-                    /*
-                    $request->validate([
-                        'file' => 'required|mimes:jpg,png,pdf|max:2048',
-                    ]);                    
-                    */
-                    //Upload to Storage
-                    $path = $this->UploadFile($request->file('file'), 'Documents');
-
-                    //reformat the file details
-                    array_push($file_details, [
-                        'path' => $path,
-                    ]);                
-                } catch (FileException $e) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'File operation failed: ' . $e->getMessage()
-                    ], 404);
-                }
-            }
-
-            //add each file details to database
-            foreach ($file_details as $key => $value) {
-                MediaFiles::create(['path' => $value]);
-            }
-        }
-
+    public function store(StoreMediaFilesRequest $request): JsonResponse
+{
+    if (!$request->hasFile('file')) {
         return response()->json([
-            'success' => true,
-            'data' => $file_details,
-            'message' => 'File(s) Uploaded Successfully'
-        ], 200);
+            'success' => false,
+            'message' => 'No se recibió ningún archivo.'
+        ], 422);
     }
+
+    $file = $request->file('file');
+
+    $path = $this->UploadFile($file, 'Documents');
+
+    $media = MediaFiles::create([
+        'path' => $path,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'id' => $media->id,
+            'path' => $media->path,
+        ],
+        'message' => 'Archivo subido correctamente.'
+    ]);
+}
 
     /**
      * Display the specified resource.

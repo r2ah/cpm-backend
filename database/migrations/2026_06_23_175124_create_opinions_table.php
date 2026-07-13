@@ -15,23 +15,31 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('entity'); //Entidad
             $table->string('address', 255);
-            $table->geography('location', subtype: 'polygon', srid: 4326);
-            $table->foreign('designer_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
-            $table->foreign('investor_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
-            $table->foreign('builder_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+//            $table->geography('location', 'polygon', 4326)->nullable();
+            $table->unsignedBigInteger('designer_id'); //Persona Natural o Juridica
+            $table->unsignedBigInteger('investor_id'); //Persona Natural o Juridica
+            $table->unsignedBigInteger('builder_id'); //Persona Natural o Juridica
             $table->text('general_characteristics')->nullable();
-            $table->foreign('issuing_company')->references('id')->on('authorities')->onDelete('cascade');  //Autoridad que emite la Incripcion
             $table->unsignedBigInteger('issuing_company');
             $table->enum('issuing_document_code', ['DUS', 'DO', 'Micro']); //TODO: Valorar si debe ser un nomenclador
             $table->text('considerations')->nullable();
             $table->text('observations')->nullable();
             $table->enum('state', ['Elaborado', 'Revisado', 'Aprobado', 'Denegado'])->default('Elaborado');
             $table->dateTime('date');
+            $table->unsignedBigInteger('commission_id');
+            $table->unsignedBigInteger('prepared_by'); //Usuario del Sistema
+            $table->unsignedBigInteger('reviewed_by'); //Usuario del Sistema
+            $table->unsignedBigInteger('approved_by'); //Usuario del Sistema
+            $table->timestamps();
+
+            $table->foreign('designer_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+            $table->foreign('investor_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+            $table->foreign('builder_id')->references('id')->on('people')->onDelete('cascade'); //Persona Natural o Juridica
+            $table->foreign('issuing_company')->references('id')->on('authorities')->onDelete('cascade');  //Autoridad que emite la Incripcion
             $table->foreign('commission_id')->references('id')->on('commissions')->onDelete('cascade');
             $table->foreign('prepared_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
             $table->foreign('reviewed_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
             $table->foreign('approved_by')->references('id')->on('users')->onDelete('cascade'); //Usuario del Sistema
-            $table->timestamps();
         });
     }
 

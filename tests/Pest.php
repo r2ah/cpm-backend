@@ -33,6 +33,11 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
+expect()->extend('toBeValidEmail', function () {
+    return $this->toMatch('/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/');
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -47,7 +52,7 @@ expect()->extend('toBeOne', function () {
 
 use Illuminate\Support\Facades\Validator;
 
-uses(Tests\TestCase::class)->in('Feature');
+//uses(Tests\TestCase::class)->in('Feature');
 uses(Tests\TestCase::class)->in('Unit');
 
 function createRequest($class, $requestBody){

@@ -3,7 +3,7 @@
 use App\Models\Person;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('does not create a person without a name field', function () {
     $response = $this->postJson('/api/people', []);

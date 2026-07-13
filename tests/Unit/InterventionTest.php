@@ -3,7 +3,7 @@
 use App\Models\Intervention;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('does not create a intervention without a name field', function () {
     $response = $this->postJson('/api/interventions', []);

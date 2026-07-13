@@ -13,11 +13,20 @@ return new class extends Migration
     {
         Schema::create('oponion_media_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('opinion_id')->constrained('opinions')->onDelete('cascade');
-            $table->foreignId('mediafile_id')->constrained('media_files')->onDelete('cascade');
             $table->unsignedBigInteger('opinion_id');
             $table->unsignedBigInteger('mediafile_id');
             $table->timestamps();
+
+            $table->foreign('opinion_id')
+                ->references('id')
+                ->on('opinions')
+                ->onDelete('cascade');
+
+            $table->foreign('mediafile_id')
+                ->references('id')
+                ->on('media_files')
+                ->onDelete('cascade');
+
         });
     }
 

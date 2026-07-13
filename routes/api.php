@@ -11,26 +11,19 @@ use App\Http\Controllers\InterventionController;
 use App\Http\Controllers\MediaFileController;
 use App\Http\Controllers\OpinionController;
 use App\Http\Controllers\PersonController;
-use App\Http\Controllers\PlanMaestroApiController;
+use App\Http\Controllers\SITApiController;
 use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
 
-Route::prefix('v1/plan-maestro')->group(function () {
-    Route::get('/', [PlanMaestroApiController::class, 'index']);
-    Route::get('/entities', [PlanMaestroApiController::class, 'getEntities']);
-    Route::get('/inscriptions', [PlanMaestroApiController::class, 'getInscriptions']);
-});
+Route::prefix('v1')->group(function () {
+	Route::prefix('plan-maestro')->group(function () {
+	    Route::get('/', [SITApiController::class, 'index']);
+	    Route::get('/entities', [SITApiController::class, 'getEntities']);
+	    Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
+	});
 
-Route::post('/login', [AuthController::class, 'login']);
+	Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    //TODO: Revisar esto
-    Route::get('user', function(Request $request){
-        return response()->json($request->user(), 200);
-    });
-    
     Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
         return Redirect::route('authorities.index');
     });
@@ -60,4 +53,17 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     });
 
     Route::post('images/upload', [MediaFileController::class, 'store']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    //TODO: Revisar esto
+    Route::get('user', function(Request $request){
+        return response()->json($request->user(), 200);
+    });
+
+});
+
+
+    
 });

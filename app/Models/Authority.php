@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Authority extends Model
 {
-    /** @use HasFactory<\Database\Factories\AuthorityFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+    ];
 
     public function opinions(): HasMany
     {
         return $this->hasMany(Opinion::class);
-    }    
+    }
 }

@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('email')->unique()->nullable();
             $table->enum('level', ['Nacional', 'Provincial', 'Municipal', 'Local'])->default('Provincial');
-            $table->geography('region', subtype: 'polygon', srid: 4326);
+	    $table->geography('region', subtype: 'point', srid: 4326)->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 

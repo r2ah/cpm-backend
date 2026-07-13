@@ -22,9 +22,20 @@ class UpdateProceedingRequest extends FormRequest
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            //
-        ];
-    }
+{
+    return [
+        'date' => ['required', 'string'],
+        'address' => ['required', 'string'],
+        'agenda' => ['nullable', 'string'],
+        'approaches' => ['nullable', 'string'],
+        'aggreements' => ['nullable', 'string'],
+
+        'commission_id' => ['required', 'integer'],
+
+        'signed_document' => ['nullable', 'integer'],
+
+        'participants' => ['nullable', 'array'],
+        'participants.*' => ['integer', 'exists:users,id'],
+    ];
+}
 }

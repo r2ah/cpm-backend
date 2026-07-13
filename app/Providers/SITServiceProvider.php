@@ -8,7 +8,7 @@ class SITServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(SITApiService::classclass, function ($app) {
+        $this->app->singletonIf(SITApiService::classclass, function ($app) {
             return new SITApiService();
         });
     }  

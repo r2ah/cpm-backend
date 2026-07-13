@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('face2face_commision_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('commission_id');
             //TODO: Pendiente el resto de los datos que publica el servicio de solicitudes
             $table->foreignId('commission_id')->constrained('commissions')->onDelete('cascade');
             $table->foreignId('signed_to')->constrained('users')->onDelete('cascade');
