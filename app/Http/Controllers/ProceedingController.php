@@ -19,7 +19,10 @@ class ProceedingController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Proceeding::with('participants');
+        $query = Proceeding::with([
+    'participants',
+    'commission'
+    ]);
 
 
         if ($request->query('all')) {

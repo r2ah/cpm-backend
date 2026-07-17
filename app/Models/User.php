@@ -128,15 +128,17 @@ class User extends Authenticatable
     /**
      * Comisiones donde participa el usuario.
      */
-    public function commissions(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Commission::class,
-            'users_commissions',
-            'user_id',
-            'commission_id'
-        );
-    }
+  public function commissions(): BelongsToMany
+{
+    return $this->belongsToMany(
+        Commission::class,
+        'users_commissions',
+        'user_id',
+        'commission_id'
+    )
+    ->withPivot('position')
+    ->withTimestamps();
+}
 
 
 

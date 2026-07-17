@@ -18,26 +18,46 @@ class AuthorityController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request) : JsonResponse
-    {
-        // Pagination + simple filtering
-        $query = Authority::query();
+{
+    // Pagination + simple filtering
+    $query = Authority::query();
 
-        if ($search = $request->query('search')) {
-            $query->where(fn($q) =>
-                $q->where('name', 'like', "%{$search}%")
-            );
-        }
 
-        if($request->query('all')) 
-            $items = $query->latest()->all();            
-        else 
-            $items = $query->latest()->paginate($request->integer('per_page', 10));
+    if ($search = $request->query('search')) {
 
-	    return response()->json([
-            'success' => true,
-            'data' => AuthorityResource::collection($items)
-        ], 200);
+        $query->where(fn($q) =>
+            $q->where('name', 'like', "%{$search}%")
+        );
+
     }
+
+
+    if($request->query('all')) {
+
+        $items = $query
+            ->latest()
+            ->get();
+
+    } else {
+
+        $items = $query
+            ->latest()
+            ->paginate(
+                $request->integer('per_page', 10)
+            );
+
+    }
+
+
+
+    return response()->json([
+
+        'success' => true,
+
+        'data' => AuthorityResource::collection($items)
+
+    ], 200);
+}
 
     public function store(StoreAuthorityRequest $request) : JsonResponse
     { 

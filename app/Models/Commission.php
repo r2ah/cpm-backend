@@ -2,30 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Commission extends Model
 {
-    /** @use HasFactory<\Database\Factories\CommissionFactory> */
-    use HasFactory;
+    protected $fillable = [
+        'name',
+        'parent_id',
+    ];
 
-    public function parent(): BelongsTo
+
+    public function members(): BelongsToMany
     {
-        return $this->belongsTo(Commission::class, 'parent_id');
+        return $this->belongsToMany(
+            User::class,
+            'users_commissions',
+            'commission_id',
+            'user_id'
+        )
+        ->withPivot('position')
+        ->withTimestamps();
     }
 
-    public function childs(): HasMany
-    {
-        return $this->hasMany(Commission::class, 'parent_id');
-    }
 
-    public  function members(): BelongsToMany
+    public function parent()
     {
-        return $this->belongsToMany(User::class);
-    }    
+        return $this->belongsTo(
+            Commission::class,
+            'parent_id'
+        );
+    }
 }

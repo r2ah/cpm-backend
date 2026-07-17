@@ -12,12 +12,33 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users_commissions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('commission_id')->constrained('commissions')->onDelete('cascade');
-            $table->enum('position', ['Especialista', 'Secretario(a) Ejecutivo(a)', 'Presidente(a)'])->default('Especialista'); //TODO: Valorar si debe ser un nomenclador
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->constrained('users')
+        ->onDelete('cascade');
+
+    $table->foreignId('commission_id')
+        ->constrained('commissions')
+        ->onDelete('cascade');
+
+    $table->enum(
+        'position',
+        [
+            'Especialista',
+            'Secretario(a) Ejecutivo(a)',
+            'Presidente(a)'
+        ]
+    )
+    ->default('Especialista');
+
+    $table->unique([
+        'user_id',
+        'commission_id'
+    ]);
+
+    $table->timestamps();
+});
     }
 
     /**

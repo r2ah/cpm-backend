@@ -16,54 +16,37 @@ use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
 
 Route::prefix('v1')->group(function () {
-	Route::prefix('plan-maestro')->group(function () {
-	    Route::get('/', [SITApiController::class, 'index']);
-	    Route::get('/entities', [SITApiController::class, 'getEntities']);
-	    Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
-	});
 
-	Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-    Route::apiResource('authorities', AuthorityController::class)->missing(function (Request $request) {
-        return Redirect::route('authorities.index');
+    Route::prefix('plan-maestro')->group(function () {
+        Route::get('/', [SITApiController::class, 'index']);
+        Route::get('/entities', [SITApiController::class, 'getEntities']);
+        Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
     });
 
-	Route::apiResource('people', PersonController::class)->missing(function (Request $request) {
-        return Redirect::route('people.index');
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::post('/logout', [AuthController::class, 'logout']);
+
+        Route::get('/user', function (Request $request) {
+            return response()->json($request->user(), 200);
+        });
+
+        Route::apiResource('authorities', AuthorityController::class);
+        Route::apiResource('people', PersonController::class);
+        Route::apiResource('proceedings', ProceedingController::class);
+        
+        Route::apiResource('interventions', InterventionController::class);
+        
+        Route::apiResource('users', UserController::class);
+        Route::apiResource('opinions', OpinionController::class);
+        Route::apiResource('commissions', CommissionController::class);
+        Route::post('images/upload', [MediaFileController::class, 'store']);
     });
-
-	Route::apiResource('proceedings', ProceedingController::class)->missing(function (Request $request) {
-        return Redirect::route('proceedings.index');
-    });
-
-	Route::apiResource('opinions', OpinionController::class)->missing(function (Request $request) {
-        return Redirect::route('opinions.index');
-    });
-
-	Route::apiResource('interventions', InterventionController::class)->missing(function (Request $request) {
-        return Redirect::route('interventions.index');
-    });
-
-    Route::apiResource('commissions', CommissionController::class)->missing(function (Request $request) {
-        return Redirect::route('commissions.index');
-    });    
-
-	Route::apiResource('users', UserController::class)->missing(function (Request $request) {
-        return Redirect::route('users.index');
-    });
-
-    Route::post('images/upload', [MediaFileController::class, 'store']);
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    //TODO: Revisar esto
-    Route::get('user', function(Request $request){
-        return response()->json($request->user(), 200);
-    });
+    
 
 });
 
 
     
-});

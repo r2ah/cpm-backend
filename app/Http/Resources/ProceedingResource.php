@@ -18,7 +18,7 @@ class ProceedingResource extends JsonResource
             'aggreements' => $this->aggreements,
 
             'commission_id' => $this->commission_id,
-
+            'commission_name' => $this->commission?->name,
             'signed_document' => $this->signed_document,
 
             'participants' => $this->whenLoaded(
