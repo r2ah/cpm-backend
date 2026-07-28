@@ -48,10 +48,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('commissions', CommissionController::class);
         
         
-        
+        Route::apiResource('users', UserController::class);
         Route::post('images/upload', [MediaFileController::class, 'store']);
     });
-    Route::apiResource('users', UserController::class);
+    
 });
 
 
