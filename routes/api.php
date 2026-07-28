@@ -14,6 +14,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\SITApiController;
 use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\CheckUserActivity;
 
 Route::prefix('v1')->group(function () {
 
@@ -25,7 +26,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware([
+    'auth:sanctum',
+    CheckUserActivity::class,
+        ])->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -35,17 +39,19 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('authorities', AuthorityController::class);
         Route::apiResource('people', PersonController::class);
-        Route::apiResource('proceedings', ProceedingController::class);
+       
         
         Route::apiResource('interventions', InterventionController::class);
-        
-        Route::apiResource('users', UserController::class);
+        Route::apiResource('proceedings', ProceedingController::class);
         Route::apiResource('opinions', OpinionController::class);
+    
         Route::apiResource('commissions', CommissionController::class);
+        
+        
+        
         Route::post('images/upload', [MediaFileController::class, 'store']);
     });
-    
-
+    Route::apiResource('users', UserController::class);
 });
 
 

@@ -13,11 +13,30 @@ class UserResource extends JsonResource
         'name'  => $this->name,
         'email' => $this->email,
         'phone' => $this->phone,
-
+        
         
         'roles' => $this->getRoleNames(),
+        
 
-        'createdAt' => $this->created_at?->toIso8601String(),
+'commissions' => $this->whenLoaded(
+    'commissions',
+    function () {
+
+        return $this->commissions->map(function ($commission) {
+
+            return [
+                'id' => $commission->id,
+                'name' => $commission->name,
+                'position' => $commission->pivot->position ?? null,
+            ];
+
+        });
+
+    }
+),
+
+
+'createdAt' => $this->created_at?->toIso8601String(),
         'updatedAt' => $this->updated_at?->toIso8601String(),
     ];
 }

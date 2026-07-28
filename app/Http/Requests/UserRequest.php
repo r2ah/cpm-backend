@@ -23,19 +23,24 @@ public function rules(): array
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string'],
             'role' => ['nullable', 'string', 'exists:roles,name'],
+            'commission_id' => ['nullable','exists:commissions,id'],
         ];
     }
 
     return [
-        'name' => ['required', 'string', 'max:255'],
-        'email' => [
-            'required',
-            'email',
-            Rule::unique('users', 'email')->ignore($this->route('user')),
-        ],
-        'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-        'phone' => ['nullable', 'string'],
-        'role' => ['nullable', 'string', 'exists:roles,name'],
-    ];
+    'name' => ['required', 'string', 'max:255'],
+    'email' => [
+        'required',
+        'email',
+        Rule::unique('users', 'email')->ignore($this->route('user')),
+    ],
+    'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+    'phone' => ['nullable', 'string'],
+    'role' => ['nullable', 'string', 'exists:roles,name'],
+    'commission_id' => [
+        'nullable',
+        'exists:commissions,id'
+    ],
+];
 }
 }

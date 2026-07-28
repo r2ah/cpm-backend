@@ -20,6 +20,7 @@ class Proceeding extends Model
         'aggreements',
         'commission_id',
         'signed_document',
+        'elaborado_por',
     ];
 
 
@@ -39,14 +40,14 @@ class Proceeding extends Model
      * Usuarios participantes del acta
      */
     public function participants(): BelongsToMany
-{
-    return $this->belongsToMany(
-        User::class,
-        'users_proceedings',
-        'proceeding_id',
-        'user_id'
-    )->withTimestamps();
-}
+    {
+        return $this->belongsToMany(
+            User::class,
+            'users_proceedings',
+            'proceeding_id',
+            'user_id'
+        )->withTimestamps();
+    }
 
 
     /**
@@ -59,4 +60,16 @@ class Proceeding extends Model
             'commission_id'
         );
     }
+
+
+    /**
+     * Usuario que elaboró el acta
+     */
+    public function elaboradoPor(): BelongsTo
+{
+    return $this->belongsTo(
+        User::class,
+        'elaborado_por'
+    );
+}
 }

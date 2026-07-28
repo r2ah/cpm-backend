@@ -13,7 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-      	$middleware->statefulApi();
+
+        $middleware->statefulApi();
+
+        //$middleware->api(append: [
+          //  \App\Http\Middleware\CheckUserActivity::class,
+        //]);
+
         //$middleware->append(\Spatie\LaravelImageOptimizer\Middlewares\OptimizeImages::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

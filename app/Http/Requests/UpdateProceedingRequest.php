@@ -30,7 +30,7 @@ class UpdateProceedingRequest extends FormRequest
         'approaches' => ['nullable', 'string'],
         'aggreements' => ['nullable', 'string'],
 
-        'commission_id' => ['required', 'integer'],
+        'elaborado_por' => ['required', 'integer', 'exists:users,id'],
 
         'signed_document' => ['nullable', 'integer'],
 

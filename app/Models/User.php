@@ -28,11 +28,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-    ];
+    'name',
+    'email',
+    'password',
+    'phone',
+    'last_activity',
+];
 
 
     protected $guard_name = 'api';
@@ -117,7 +118,16 @@ class User extends Authenticatable
     }
 
 
-
+    /**
+ * Actas elaboradas por el usuario.
+ */
+public function proceedingsPrepared(): HasMany
+{
+    return $this->hasMany(
+        Proceeding::class,
+        'elaborado_por'
+    );
+}
     /*
     |--------------------------------------------------------------------------
     | COMMISSIONS
@@ -193,10 +203,11 @@ class User extends Authenticatable
 
 
     protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+{
+    return [
+        'email_verified_at' => 'datetime',
+        'last_activity' => 'datetime',
+        'password' => 'hashed',
+    ];
+}
 }

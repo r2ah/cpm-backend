@@ -15,28 +15,34 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+       if (Auth::attempt($credentials)) {
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+    $user = Auth::user();
 
-            $roles = $user->roles->pluck('name');
+    // Registrar la última actividad
+    $user->update([
+        'last_activity' => now()
+    ]);
 
-            $permissions = $request->user()->getPermissionsViaRoles();
+    $token = $user->createToken('auth_token')->plainTextToken;
 
-            return response()->json([
-                'message' => 'Login Successfully',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email
-                ],
-                'roles' => $roles,
-                'permissions' => $permissions
-            ], 200);
-        }
+    $roles = $user->roles->pluck('name');
+
+    $permissions = $user->getPermissionsViaRoles();
+
+    return response()->json([
+        'message' => 'Login Successfully',
+        'access_token' => $token,
+        'token_type' => 'Bearer',
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email
+        ],
+        'roles' => $roles,
+        'permissions' => $permissions
+    ], 200);
+}
 
         throw ValidationException::withMessages([
             'email' => ['The provided credentials are incorrect.'],
@@ -44,13 +50,21 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request)
-    {
-        // Revoke Sanctum token (the route uses auth:sanctum)
-        $request->user()?->currentAccessToken()?->delete();
+{
+    $user = $request->user();
 
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ], 200);
+    if ($user) {
+
+        $user->update([
+            'last_activity' => null
+        ]);
+
+        $user->currentAccessToken()?->delete();
     }
+
+    return response()->json([
+        'message' => 'Successfully logged out'
+    ], 200);
+}
 }
 

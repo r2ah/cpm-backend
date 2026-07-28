@@ -26,7 +26,9 @@ class UserController extends Controller
      */
     public function index(Request $request) : JsonResponse
 {
-    $users = User::latest()->get();
+    $users = User::with([
+    'commissions'
+])->latest()->get();
 
     return response()->json([
         'success' => true,
@@ -49,10 +51,20 @@ public function store(UserRequest $request)
         'password' => Hash::make($validated['password']),
         'phone' => $validated['phone'] ?? null,
     ]);
+    if (!empty($validated['commission_id'])) {
+
+    $user->commissions()->sync([
+        $validated['commission_id']
+    ]);
+
+}
 
     if (!empty($validated['role'])) {
     $user->syncRoles([$validated['role']]);
      }
+    if (!empty($validated['role'])) {
+    $user->syncRoles([$validated['role']]);
+    } 
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -67,19 +79,22 @@ public function store(UserRequest $request)
      * Display the specified resource.
      */
     public function show(User $user) : JsonResponse
-    {
-        return response()->json([
-            'success' => true,
-            'data' => new UserResource($user)
-        ], 200);
-    }
+{
+    $user->load('commissions');
+
+    return response()->json([
+        'success' => true,
+        'data' => new UserResource($user)
+    ], 200);
+}
 
     /**
      * Update the specified resource in storage.
      */
-   public function update(UserRequest $request, User $user)
+  public function update(UserRequest $request, User $user)
 {
     $validated = $request->validated();
+    logger()->info('DATOS UPDATE USER', $validated);
 
     $user->update([
         'name' => $validated['name'],
@@ -87,18 +102,47 @@ public function store(UserRequest $request)
         'phone' => $validated['phone'] ?? null,
     ]);
 
+
     if (!empty($validated['password'])) {
+
         $user->password = Hash::make($validated['password']);
         $user->save();
+
     }
 
+
     if (!empty($validated['role'])) {
-    $user->syncRoles([$validated['role']]);
+
+        $user->syncRoles([
+            $validated['role']
+        ]);
+
     }
+
+
+    // ACTUALIZAR COMISIÓN
+    if (array_key_exists('commission_id', $validated)) {
+
+        if ($validated['commission_id']) {
+
+            $user->commissions()->sync([
+                $validated['commission_id']
+            ]);
+
+        } else {
+
+            $user->commissions()->detach();
+
+        }
+
+    }
+
 
     return response()->json([
         'success' => true,
-        'data' => new UserResource($user)
+        'data' => new UserResource(
+            $user->load('commissions')
+        )
     ]);
 }
     /**
