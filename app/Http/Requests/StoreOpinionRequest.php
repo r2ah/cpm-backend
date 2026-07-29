@@ -122,7 +122,18 @@ class StoreOpinionRequest extends FormRequest
         'approved_by'=>[
             'required',
             'exists:users,id'
-        ]
+        ],
+
+        'intervention_ids'=>[
+        'nullable',
+        'array'
+        ],
+
+
+        'intervention_ids.*'=>[
+        'integer',
+        'exists:interventions,id'
+        ],
 
     ];
 }

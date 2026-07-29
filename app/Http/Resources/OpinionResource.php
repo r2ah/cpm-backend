@@ -11,67 +11,52 @@ class OpinionResource extends JsonResource
 
 public function toArray(Request $request): array
 {
+    return [
 
-return [
+        'id'=>$this->id,
 
-'id'=>$this->id,
+        'entity'=>$this->entity,
 
+        'address'=>$this->address,
 
-'entity'=>$this->entity,
+        'designer'=>$this->designer,
 
-'address'=>$this->address,
+        'investor'=>$this->investor,
 
+        'builder'=>$this->builder,
 
-'designer_id'=>$this->designer_id,
+        'general_characteristics'=>$this->general_characteristics,
 
-'investor_id'=>$this->investor_id,
+        'issuing_company'=>$this->issuingCompany,
 
-'builder_id'=>$this->builder_id,
+        'issuing_document_code'=>$this->issuing_document_code,
 
+        'considerations'=>$this->considerations,
 
-'general_characteristics'=>$this->general_characteristics,
+        'observations'=>$this->observations,
 
+        'state'=>$this->state,
 
-'issuing_company'=>$this->issuing_company,
-
-'issuing_document_code'=>$this->issuing_document_code,
-
-
-'considerations'=>$this->considerations,
-
-'observations'=>$this->observations,
+        'date'=>$this->date,
 
 
-'state'=>$this->state,
+        'commission'=>$this->commission,
+
+        'prepared_by'=>$this->preparedBy,
+
+        'reviewed_by'=>$this->reviewedBy,
+
+        'approved_by'=>$this->approvedBy,
+        
+        'interventions' =>$this->interventions,
 
 
-'date'=>$this->date,
 
+        'createdAt'=>$this->created_at?->toIso8601String(),
 
-'commission_id'=>$this->commission_id,
+        'updatedAt'=>$this->updated_at?->toIso8601String(),
 
-
-'prepared_by'=>$this->prepared_by,
-
-'reviewed_by'=>$this->reviewed_by,
-
-'approved_by'=>$this->approved_by,
-
-
-'designer'=>$this->designer,
-
-'investor'=>$this->investor,
-
-'builder'=>$this->builder,
-
-
-'createdAt'=>$this->created_at?->toIso8601String(),
-
-'updatedAt'=>$this->updated_at?->toIso8601String(),
-
-
-];
-
+    ];
 }
 
 }

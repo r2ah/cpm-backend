@@ -41,17 +41,18 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('people', PersonController::class);
        
         
-        Route::apiResource('interventions', InterventionController::class);
-        Route::apiResource('proceedings', ProceedingController::class);
-        Route::apiResource('opinions', OpinionController::class);
+        
+        
     
         Route::apiResource('commissions', CommissionController::class);
+        Route::apiResource('proceedings', ProceedingController::class);
         
-        
+        Route::apiResource('interventions', InterventionController::class);
+        Route::apiResource('opinions', OpinionController::class);
         Route::apiResource('users', UserController::class);
         Route::post('images/upload', [MediaFileController::class, 'store']);
     });
-    
+   
 });
 
 

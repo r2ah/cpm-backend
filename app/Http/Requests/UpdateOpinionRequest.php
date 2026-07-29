@@ -57,6 +57,16 @@ class UpdateOpinionRequest extends FormRequest
 
         'approved_by'=>'sometimes|exists:users,id',
 
+        'intervention_ids' => [
+    'nullable',
+    'array'
+],
+
+'intervention_ids.*' => [
+    'integer',
+    'exists:interventions,id'
+],
+
     ];
 }
 }

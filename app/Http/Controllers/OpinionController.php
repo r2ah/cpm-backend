@@ -22,8 +22,17 @@ class OpinionController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Opinion::query();
-
+        $query = Opinion::with([
+    'commission',
+    'preparedBy',
+    'reviewedBy',
+    'approvedBy',
+    'designer',
+    'investor',
+    'builder',
+    'issuingCompany',
+    'interventions'
+]);
         if ($search = $request->query('search')) {
 
             $query->where(function ($q) use ($search) {
@@ -61,65 +70,107 @@ class OpinionController extends Controller
      * Store a newly created resource.
      */
     public function store(StoreOpinionRequest $request): JsonResponse
-{   logger()->debug($request->header('Authorization'));
+{
+    logger()->debug($request->header('Authorization'));
+
     try {
 
         logger('ENTRO AL STORE');
 
+
         $validated = $request->validated();
+
+
+        // Guardamos las intervenciones aparte
+        $interventions = $validated['intervention_ids'] ?? [];
+
+
+        // Quitamos para que no intente guardarlo en opinions
+        unset($validated['intervention_ids']);
+
 
         logger('VALIDADO');
 
+
         $authUser = Auth::user();
 
-        logger('AUTH');
 
         if ($authUser->hasRole('admin')) {
 
-            logger('ADMIN');
 
             $preparedBy = User::with('commissions')
                 ->findOrFail($validated['prepared_by']);
 
-            logger('USUARIO ENCONTRADO');
 
-            $commission = $preparedBy->commissions->first();
+            $commission = $preparedBy
+                ->commissions
+                ->first();
 
-            logger('COMISION OBTENIDA');
 
         } else {
 
-            logger('EDITOR');
 
             $authUser->load('commissions');
 
-            $commission = $authUser->commissions->first();
+
+            $commission = $authUser
+                ->commissions
+                ->first();
 
         }
 
-        logger('ANTES DEL CREATE');
 
-        $validated['commission_id'] = $commission->id;
+        if(!$commission){
+
+            throw new \Exception(
+                "El usuario no pertenece a ninguna comisión."
+            );
+
+        }
+
+
+        $validated['commission_id'] =
+            $commission->id;
+
+
 
         $opinion = Opinion::create($validated);
 
+
+
+        // GUARDAR INTERVENCIONES
+        if(!empty($interventions)){
+
+            $opinion->interventions()
+                ->sync($interventions);
+
+        }
+
+
         logger('DESPUES DEL CREATE');
 
+
         return response()->json([
-            'success' => true,
-            'data' => new OpinionResource($opinion)
+            'success'=>true,
+            'data'=>new OpinionResource($opinion)
         ]);
+
 
     } catch (\Throwable $e) {
 
+
         logger()->error($e->getMessage());
-        logger()->error($e->getFile().':'.$e->getLine());
+        logger()->error(
+            $e->getFile().':'.$e->getLine()
+        );
+
 
         return response()->json([
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
+            'message'=>$e->getMessage(),
+            'line'=>$e->getLine(),
+            'file'=>$e->getFile(),
         ],500);
+
     }
 }
 
@@ -127,12 +178,23 @@ class OpinionController extends Controller
      * Display the specified resource.
      */
     public function show(Opinion $opinion): JsonResponse
-    {
-        return response()->json([
-            'success' => true,
-            'data' => new OpinionResource($opinion)
-        ]);
-    }
+{
+    $opinion->load([
+        'commission',
+        'preparedBy',
+        'reviewedBy',
+        'approvedBy',
+        'designer',
+        'investor',
+        'builder',
+        'issuingCompany'
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'data' => new OpinionResource($opinion)
+    ]);
+}
 
     /**
      * Update the specified resource.
@@ -145,62 +207,105 @@ class OpinionController extends Controller
 
         $validated = $request->validated();
 
-        logger('VALIDADO');
+
+        // Guardamos las intervenciones aparte
+        $interventions = $validated['intervention_ids'] ?? [];
+
+
+        // Quitamos del array porque no pertenece a la tabla opinions
+        unset($validated['intervention_ids']);
+
+
 
         $authUser = Auth::user();
 
-        logger('AUTH');
 
         if (!$authUser) {
-            throw new \Exception('Usuario no autenticado.');
+
+            return response()->json([
+                'message' => 'Usuario no autenticado'
+            ],401);
+
         }
+
+
 
         if ($authUser->hasRole('admin')) {
 
-            logger('ADMIN');
 
             $preparedBy = User::with('commissions')
                 ->findOrFail($validated['prepared_by']);
 
-            $commission = $preparedBy->commissions->first();
+
+            $commission = $preparedBy
+                ->commissions
+                ->first();
+
 
         } else {
 
-            logger('EDITOR');
 
             $authUser->load('commissions');
 
-            $commission = $authUser->commissions->first();
+
+            $commission = $authUser
+                ->commissions
+                ->first();
 
         }
+
+
 
         if (!$commission) {
-            throw new \Exception('El usuario no pertenece a ninguna comisión.');
+
+            throw new \Exception(
+                'El usuario no pertenece a ninguna comisión.'
+            );
+
         }
 
-        $validated['commission_id'] = $commission->id;
 
-        logger('ANTES DEL UPDATE');
 
+        $validated['commission_id'] =
+            $commission->id;
+
+
+
+        // Actualizar dictamen
         $opinion->update($validated);
 
-        logger('DESPUES DEL UPDATE');
+
+
+        // ACTUALIZAR INTERVENCIONES
+        $opinion->interventions()->sync(
+            $interventions
+        );
+
+
 
         return response()->json([
-            'success' => true,
-            'data' => new OpinionResource($opinion)
+            'success'=>true,
+            'data'=>new OpinionResource(
+                $opinion->load('interventions')
+            )
         ]);
 
-    } catch (\Throwable $e) {
 
-        logger()->error($e->getMessage());
-        logger()->error($e->getFile().':'.$e->getLine());
+
+    } catch(\Throwable $e) {
+
+
+        logger()->error(
+            $e->getMessage()
+        );
+
 
         return response()->json([
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-        ], 500);
+            'message'=>$e->getMessage(),
+            'line'=>$e->getLine(),
+            'file'=>$e->getFile()
+        ],500);
+
     }
 }
 

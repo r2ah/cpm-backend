@@ -2,36 +2,75 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateInterventionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
+
     public function rules(): array
     {
+
+        $interventionId = $this->route('intervention')->id;
+
+
         return [
-            'name' => ['sometimes', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')]
+
+            'name' => [
+                'sometimes',
+                'string',
+                'min:3',
+                'max:100',
+
+                Rule::unique('interventions','name')
+                    ->ignore($interventionId)
+            ],
+
+
+            'parent_id' => [
+
+                'nullable',
+
+                'exists:interventions,id',
+
+                // No puede ser él mismo
+                function ($attribute, $value, $fail) use ($interventionId) {
+
+                    if ($value == $interventionId) {
+
+                        $fail(
+                            'Una intervención no puede ser superior de sí misma.'
+                        );
+
+                    }
+
+                },
+
+            ]
+
         ];
+
     }
+
 
     public function messages(): array
     {
         return [
-            'name.unique' => __('Este tipo de intervención ya existe.')
+
+            'name.unique' =>
+            'Este tipo de intervención ya existe.',
+
+
+            'parent_id.exists' =>
+            'La intervención superior seleccionada no existe.'
+
         ];
-    }    
+    }
+
 }
