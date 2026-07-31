@@ -12,8 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreOpinionRequest;
 use App\Http\Requests\UpdateOpinionRequest;
 use App\Http\Resources\OpinionResource;
-
+use App\Models\OpinionDocument;
 use Illuminate\Validation\ValidationException;
+
+use Illuminate\Support\Facades\Storage;
+
 
 class OpinionController extends Controller
 {
@@ -21,50 +24,52 @@ class OpinionController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request): JsonResponse
-    {
-        $query = Opinion::with([
-    'commission',
-    'preparedBy',
-    'reviewedBy',
-    'approvedBy',
-    'designer',
-    'investor',
-    'builder',
-    'issuingCompany',
-    'interventions'
-]);
-        if ($search = $request->query('search')) {
+{
+    $query = Opinion::with([
+        'commission',
+        'preparedBy',
+        'reviewedBy',
+        'approvedBy',
+        'designer',
+        'investor',
+        'builder',
+        'issuingCompany',
+        'interventions',
+        'documents'
+    ]);
 
-            $query->where(function ($q) use ($search) {
+    if ($search = $request->query('search')) {
 
-                $q->where('entity', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
+        $query->where(function ($q) use ($search) {
 
-            });
+            $q->where('entity', 'like', "%{$search}%")
+              ->orWhere('address', 'like', "%{$search}%");
 
-        }
+        });
 
-        if ($request->query('all')) {
-
-            $items = $query
-                ->latest()
-                ->get();
-
-        } else {
-
-            $items = $query
-                ->latest()
-                ->paginate(
-                    $request->integer('per_page', 10)
-                );
-
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => OpinionResource::collection($items)
-        ]);
     }
+
+    if ($request->query('all')) {
+
+        $items = $query
+            ->latest()
+            ->get();
+
+    } else {
+
+        $items = $query
+            ->latest()
+            ->paginate(
+                $request->integer('per_page', 10)
+            );
+
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => OpinionResource::collection($items)
+    ]);
+}
 
     /**
      * Store a newly created resource.
@@ -146,14 +151,70 @@ class OpinionController extends Controller
 
         }
 
+        // ================================
+// GUARDAR DOCUMENTOS
+// ================================
+
+if($request->hasFile('documents')){
+
+
+    foreach($request->file('documents') as $file){
+
+
+        $path = $file->store(
+            'opinions/documents',
+            'public'
+        );
+
+
+        OpinionDocument::create([
+
+            'opinion_id' => $opinion->id,
+
+            'original_name' =>
+                $file->getClientOriginalName(),
+
+            'file_name' =>
+                basename($path),
+
+            'path' =>
+                $path,
+
+            'mime_type' =>
+                $file->getMimeType(),
+
+            'size' =>
+                $file->getSize(),
+
+        ]);
+
+
+    }
+
+}
+
 
         logger('DESPUES DEL CREATE');
 
 
-        return response()->json([
-            'success'=>true,
-            'data'=>new OpinionResource($opinion)
-        ]);
+        $opinion->load([
+    'documents',
+    'interventions',
+    'designer',
+    'investor',
+    'builder',
+    'issuingCompany',
+    'commission',
+    'preparedBy',
+    'reviewedBy',
+    'approvedBy'
+]);
+
+
+return response()->json([
+    'success'=>true,
+    'data'=>new OpinionResource($opinion)
+]);
 
 
     } catch (\Throwable $e) {
@@ -177,7 +238,7 @@ class OpinionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Opinion $opinion): JsonResponse
+   public function show(Opinion $opinion): JsonResponse
 {
     $opinion->load([
         'commission',
@@ -187,7 +248,9 @@ class OpinionController extends Controller
         'designer',
         'investor',
         'builder',
-        'issuingCompany'
+        'issuingCompany',
+        'interventions',
+        'documents',
     ]);
 
     return response()->json([
@@ -281,13 +344,95 @@ class OpinionController extends Controller
             $interventions
         );
 
+        // ================================
+// ELIMINAR DOCUMENTOS
+// ================================
+
+if($request->filled('documents_to_delete')){
+
+
+    $documents = OpinionDocument::whereIn(
+        'id',
+        $request->documents_to_delete
+    )
+    ->where('opinion_id',$opinion->id)
+    ->get();
+
+
+
+    foreach($documents as $document){
+
+
+        Storage::disk('public')
+            ->delete($document->path);
+
+
+
+        $document->delete();
+
+
+    }
+
+}
+
+// ================================
+// AGREGAR NUEVOS DOCUMENTOS
+// ================================
+
+if($request->hasFile('documents')){
+
+
+    foreach($request->file('documents') as $file){
+
+
+        if(!$file->isValid()){
+
+            continue;
+
+        }
+
+
+        $path = $file->store(
+            'opinions/documents',
+            'public'
+        );
+
+
+        OpinionDocument::create([
+
+            'opinion_id'=>$opinion->id,
+
+            'original_name'=>
+                $file->getClientOriginalName(),
+
+            'file_name'=>
+                basename($path),
+
+            'path'=>$path,
+
+            'mime_type'=>
+                $file->getMimeType(),
+
+            'size'=>
+                $file->getSize(),
+
+        ]);
+
+
+    }
+
+}
+
 
 
         return response()->json([
             'success'=>true,
             'data'=>new OpinionResource(
-                $opinion->load('interventions')
-            )
+             $opinion->load([
+            'interventions',
+            'documents'
+            ])
+        )
         ]);
 
 

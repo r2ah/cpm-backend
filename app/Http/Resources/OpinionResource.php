@@ -50,6 +50,30 @@ public function toArray(Request $request): array
         
         'interventions' =>$this->interventions,
 
+        'documents' => $this->whenLoaded('documents', function(){
+
+    return $this->documents->map(function($document){
+
+        return [
+
+            'id'=>$document->id,
+
+            'name'=>$document->original_name,
+
+            'download_url' =>
+                url(
+                    "/api/v1/opinion-documents/{$document->id}/download"
+                ),
+
+            'mime_type'=>$document->mime_type,
+
+            'size'=>$document->size
+
+        ];
+
+    });
+
+}),
 
 
         'createdAt'=>$this->created_at?->toIso8601String(),

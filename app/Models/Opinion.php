@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Intervention;
 
 class Opinion extends Model
@@ -120,6 +121,13 @@ class Opinion extends Model
         'intervention_opinion',
         'opinion_id',
         'intervention_id'
+    );
+}
+
+public function documents(): HasMany
+{
+    return $this->hasMany(
+        OpinionDocument::class
     );
 }
 
