@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('face2face_commision_requests', function (Blueprint $table) {
             $table->id();
             //TODO: Pendiente el resto de los datos que publica el servicio de solicitudes
+            $table->foreignId('client_id')->constrained('people')->onDelete('cascade');
             $table->foreignId('commission_id')->constrained('commissions')->onDelete('cascade');
             $table->foreignId('signed_to')->constrained('users')->onDelete('cascade');
             $table->foreignId('attended_by')->constrained('users')->onDelete('cascade');

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('date');
             $table->string('address', 255); //Lugar //TODO: Esto debe poder ser la ubicacion geografica donde se realiza la reunion.
-//            $table->geography('location', 'polygon', 4326)->nullable();
+            $table->geography('location', 'polygon', 4326)->nullable();
 	    $table->unsignedBigInteger('commission_id');
             $table->text('agenda'); //Orden del Dia
             $table->text('approaches')->nullable(); //Intervenciones o planteamientos
