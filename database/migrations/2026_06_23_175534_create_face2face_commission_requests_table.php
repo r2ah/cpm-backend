@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('face2face_commision_requests', function (Blueprint $table) {
+        Schema::create('face2face_commission_requests', function (Blueprint $table) {
             $table->id();
             //TODO: Pendiente el resto de los datos que publica el servicio de solicitudes
             $table->foreignId('client_id')->constrained('people')->onDelete('cascade');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('face2face_commision_requests');
+        Schema::dropIfExists('face2face_commission_requests');
     }
 };
