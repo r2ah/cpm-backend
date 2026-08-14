@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreFace2FaceCommissionRequestRequest;
-use App\Http\Requests\UpdateFace2FaceCommissionRequestRequest;
+use App\Http\Requests\StoreFace2FaceCommissionRequest_Request;
+use App\Http\Requests\UpdateFace2FaceCommissionRequest_Request;
 use App\Models\Face2FaceCommissionRequest;
 
 class Face2FaceCommissionRequestController extends Controller
@@ -27,7 +27,7 @@ class Face2FaceCommissionRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreFace2FaceCommissionRequestRequest $request)
+    public function store(StoreFace2FaceCommissionRequest_Request $request)
     {
         //
     }
@@ -51,7 +51,7 @@ class Face2FaceCommissionRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateFace2FaceCommissionRequestRequest $request, Face2FaceCommissionRequest $face2FaceCommissionRequest)
+    public function update(UpdateFace2FaceCommissionRequest_Request $request, Face2FaceCommissionRequest $face2FaceCommissionRequest)
     {
         //
     }

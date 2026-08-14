@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreFace2FaceCommissionRequestRequest extends FormRequest
+class UpdateFace2FaceCommissionRequest_Request extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
