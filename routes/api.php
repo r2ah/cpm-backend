@@ -16,6 +16,8 @@ use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckUserActivity;
 
+use App\Http\Controllers\PatrimonioController;
+
 
 use App\Http\Controllers\OpinionDocumentController;
 
@@ -55,7 +57,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('proceedings', ProceedingController::class);
         Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
-   
+   Route::get('/patrimonio', [PatrimonioController::class, 'index']);
 });
 
 
