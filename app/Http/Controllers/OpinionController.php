@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OpinionCreated;
+use App\Events\OpinionStateChanged;
 use App\Models\Opinion;
 use App\Models\User;
 
@@ -142,6 +144,8 @@ class OpinionController extends Controller
         $opinion = Opinion::create($validated);
 
 
+	//Send notifications
+	OpinionCreated::dispatch($opinion);
 
         // GUARDAR INTERVENCIONES
         if(!empty($interventions)){
@@ -333,10 +337,13 @@ return response()->json([
             $commission->id;
 
 
+	$state_changed = ($opinion['state'] != $validated['state']);
 
         // Actualizar dictamen
         $opinion->update($validated);
 
+	//Send notifications
+	OpinionStateChaged::dispatchIf($state_changed, $opinion);
 
 
         // ACTUALIZAR INTERVENCIONES
