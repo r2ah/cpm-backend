@@ -13,11 +13,11 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Appointment::with('commission')
+        $query = Appointment::with(['person', 'commission'])
             ->orderBy('date')
             ->orderBy('time');
 
-        // Si se proporciona una fecha, filtrar por ella.
+        // Filtrar por fecha.
         if ($request->filled('date')) {
             $query->whereDate('date', $request->date);
         }
@@ -40,34 +40,10 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ci' => [
+            'person_id' => [
                 'required',
-                'string',
-                'max:50',
-            ],
-
-            'nombre' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-
-            'apellidos' => [
-                'required',
-                'string',
-                'max:150',
-            ],
-
-            'email' => [
-                'nullable',
-                'email',
-                'max:150',
-            ],
-
-            'telefono' => [
-                'nullable',
-                'string',
-                'max:50',
+                'integer',
+                'exists:people,id',
             ],
 
             'commission_id' => [
@@ -115,7 +91,10 @@ class AppointmentController extends Controller
 
         $appointment = Appointment::create($validated);
 
-        $appointment->load('commission');
+        $appointment->load([
+            'person',
+            'commission',
+        ]);
 
         return response()->json([
             'message' => 'Cita creada correctamente.',
@@ -128,7 +107,10 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        $appointment->load('commission');
+        $appointment->load([
+            'person',
+            'commission',
+        ]);
 
         return response()->json([
             'data' => $appointment,
@@ -143,20 +125,11 @@ class AppointmentController extends Controller
         Appointment $appointment
     ) {
         $validated = $request->validate([
-            'ci' => 'sometimes|required|string|max:50',
-            'nombre' => 'sometimes|required|string|max:100',
-            'apellidos' => 'sometimes|required|string|max:150',
-
-            'email' => [
-                'nullable',
-                'email',
-                'max:150',
-            ],
-
-            'telefono' => [
-                'nullable',
-                'string',
-                'max:50',
+            'person_id' => [
+                'sometimes',
+                'required',
+                'integer',
+                'exists:people,id',
             ],
 
             'commission_id' => [
@@ -195,6 +168,10 @@ class AppointmentController extends Controller
         $time = $validated['time']
             ?? $appointment->time;
 
+        /*
+         * Comprobar que la comisión no tenga
+         * otra cita en la misma fecha y hora.
+         */
         $exists = Appointment::where(
             'commission_id',
             $commissionId
@@ -214,7 +191,10 @@ class AppointmentController extends Controller
 
         $appointment->update($validated);
 
-        $appointment->load('commission');
+        $appointment->load([
+            'person',
+            'commission',
+        ]);
 
         return response()->json([
             'message' => 'Cita actualizada correctamente.',

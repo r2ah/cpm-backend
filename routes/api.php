@@ -44,7 +44,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::apiResource('authorities', AuthorityController::class);
-        Route::apiResource('people', PersonController::class);
+        
     
         Route::apiResource('commissions', CommissionController::class);
         
@@ -58,7 +58,9 @@ Route::prefix('v1')->group(function () {
         
         Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
-   Route::get('/patrimonio', [PatrimonioController::class, 'index']);Route::apiResource('appointments', AppointmentController::class);
+   Route::get('/patrimonio', [PatrimonioController::class, 'index']);
+   Route::apiResource('people', PersonController::class);
+   Route::apiResource('appointments', AppointmentController::class);
 });
 
 

@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
 	    CommissionSeeder::class,
 	    ProceedingSeeder::class,
 	    OpinionSeeder::class,
+        AppointmentSeeder::class,
 	]);
     }
 }

@@ -62,84 +62,119 @@ public function store(StoreProceedingRequest $request): JsonResponse
 {
     $validated = $request->validated();
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELACIONES
+    |--------------------------------------------------------------------------
+    */
 
-    // Separar documentos porque no pertenecen a proceedings
-    $documents = $validated['documents'] ?? [];
+    $documents = array_map(
+        'intval',
+        $validated['documents'] ?? []
+    );
 
-    unset($validated['documents']);
+    $participants = array_map(
+        'intval',
+        $validated['participants'] ?? []
+    );
 
+    unset(
+        $validated['documents'],
+        $validated['participants']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDAR ELABORADOR
+    |--------------------------------------------------------------------------
+    */
 
     $elaborador = User::with('commissions')
         ->find($validated['elaborado_por']);
 
-
     if (!$elaborador) {
-
         return response()->json([
             'success' => false,
             'message' => 'Usuario elaborador no encontrado.'
         ], 422);
-
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | OBTENER COMISIÓN DEL ELABORADOR
+    |--------------------------------------------------------------------------
+    */
 
     $commission = $elaborador->commissions->first();
 
-
     if (!$commission) {
-
         return response()->json([
             'success' => false,
-            'message' => 'El usuario seleccionado no pertenece a ninguna comisión.'
+            'message' =>
+                'El usuario seleccionado no pertenece a ninguna comisión.'
         ], 422);
-
     }
 
 
-
-    // Asignar comisión antes de crear
-    $validated['commission_id'] = $commission->id;
-
+    $validated['commission_id'] =
+        $commission->id;
 
 
-    // Crear acta UNA SOLA VEZ
-    $proceeding = Proceeding::create($validated);
+    /*
+    |--------------------------------------------------------------------------
+    | CREAR ACTA
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding =
+        Proceeding::create($validated);
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | PARTICIPANTES
+    |--------------------------------------------------------------------------
+    */
 
-    // Guardar participantes
-    if (!empty($validated['participants'])) {
-
-        $proceeding->participants()
-            ->attach($validated['participants']);
-
-    }
+    $proceeding
+        ->participants()
+        ->sync($participants);
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | DOCUMENTOS
+    |--------------------------------------------------------------------------
+    */
 
-    // Guardar documentos
-    if (!empty($documents)) {
+    $proceeding
+        ->documents()
+        ->sync($documents);
 
-        $proceeding->documents()
-            ->attach($documents);
 
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
 
+    $proceeding->load([
+        'participants',
+        'commission',
+        'elaboradoPor',
+        'documents'
+    ]);
 
 
     return response()->json([
         'success' => true,
         'data' => new ProceedingResource(
-            $proceeding->load(
-    'participants',
-    'commission',
-    'elaboradoPor',
-    'documents'
-)
+            $proceeding
         )
     ], 201);
 }
-
 
     /**
      * Display the specified resource.

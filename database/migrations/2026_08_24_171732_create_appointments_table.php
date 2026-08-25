@@ -9,22 +9,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('appointments', function (Blueprint $table) {
+
             $table->id();
 
-            $table->string('ci');
-            $table->string('nombre');
-            $table->string('apellidos');
+            // Persona seleccionada para la cita
+            $table->foreignId('person_id')
+                ->constrained('people')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
 
-            // Datos opcionales del cliente
-            $table->string('email')->nullable();
-            $table->string('telefono')->nullable();
-
+            // Comisión seleccionada para la cita
             $table->foreignId('commission_id')
                 ->constrained('commissions')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
             $table->date('date');
+
             $table->time('time');
 
             $table->string('status')
@@ -32,8 +33,11 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Evita dos citas de la misma comisión
-            // en la misma fecha y hora.
+            /*
+             * Evita que una misma comisión
+             * tenga dos citas en la misma
+             * fecha y hora.
+             */
             $table->unique([
                 'commission_id',
                 'date',

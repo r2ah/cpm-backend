@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreProceedingRequest extends FormRequest
 {
@@ -22,36 +21,99 @@ class StoreProceedingRequest extends FormRequest
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-{
-    return [
-        'date' => ['required', 'string'],
-        'address' => ['required', 'string'],
+    {
+        return [
 
-        'agenda' => ['nullable', 'string'],
-        'approaches' => ['nullable', 'string'],
-        'aggreements' => ['nullable', 'string'],
+            /*
+            |--------------------------------------------------------------------------
+            | DATOS DEL ACTA
+            |--------------------------------------------------------------------------
+            */
 
-        'elaborado_por' => [
-            'required',
-            'integer',
-            'exists:users,id'
-        ],
+            'date' => [
+                'required',
+                'string'
+            ],
 
-        'signed_document' => [
-            'nullable',
-            'integer'
-        ],
+            'address' => [
+                'required',
+                'string'
+            ],
 
-        'participants' => [
-            'nullable',
-            'array'
-        ],
+            'agenda' => [
+                'nullable',
+                'string'
+            ],
 
-        'participants.*' => [
-            'integer',
-            'exists:users,id'
-        ],
-    ];
-}
+            'approaches' => [
+                'nullable',
+                'string'
+            ],
 
+            'aggreements' => [
+                'nullable',
+                'string'
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ELABORADO POR
+            |--------------------------------------------------------------------------
+            */
+
+            'elaborado_por' => [
+                'required',
+                'integer',
+                'exists:users,id'
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DOCUMENTO FIRMADO
+            |--------------------------------------------------------------------------
+            */
+
+            'signed_document' => [
+                'nullable',
+                'integer',
+                'exists:media_files,id'
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DOCUMENTOS ASOCIADOS
+            |--------------------------------------------------------------------------
+            */
+
+            'documents' => [
+                'nullable',
+                'array'
+            ],
+
+            'documents.*' => [
+                'integer',
+                'exists:media_files,id'
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PARTICIPANTES
+            |--------------------------------------------------------------------------
+            */
+
+            'participants' => [
+                'nullable',
+                'array'
+            ],
+
+            'participants.*' => [
+                'integer',
+                'exists:users,id'
+            ],
+        ];
+    }
 }

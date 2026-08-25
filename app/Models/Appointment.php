@@ -8,11 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Appointment extends Model
 {
     protected $fillable = [
-        'ci',
-        'nombre',
-        'apellidos',
-        'email',
-        'telefono',
+        'person_id',
         'commission_id',
         'date',
         'time',
@@ -23,6 +19,20 @@ class Appointment extends Model
         'date' => 'date',
     ];
 
+    /**
+     * Persona asociada a la cita.
+     */
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(
+            Person::class,
+            'person_id'
+        );
+    }
+
+    /**
+     * Comisión asociada a la cita.
+     */
     public function commission(): BelongsTo
     {
         return $this->belongsTo(
