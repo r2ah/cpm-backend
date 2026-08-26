@@ -33,22 +33,54 @@ class MediaFileController extends Controller
     }
 
     $file = $request->file('file');
-
+ 
     $path = $this->UploadFile($file, 'Documents');
 
     $media = MediaFiles::create([
-        'path' => $path,
-    ]);
+    'name' => $file->getClientOriginalName(),
+    'path' => $path,
+]);
 
     return response()->json([
-        'success' => true,
-        'data' => [
-            'id' => $media->id,
-            'path' => $media->path,
-        ],
-        'message' => 'Archivo subido correctamente.'
-    ]);
+    'success' => true,
+    'data' => [
+        'id' => $media->id,
+        'name' => $media->name,
+        'path' => $media->path,
+    ],
+    'message' => 'Archivo subido correctamente.'
+]);
 }
+
+
+
+public function download(MediaFiles $file)
+{
+    if(!$file->path){
+        return response()->json([
+            'message'=>'Archivo no encontrado'
+        ],404);
+    }
+
+
+    $path = storage_path(
+        'app/public/'.$file->path
+    );
+
+
+    if(!file_exists($path)){
+
+        return response()->json([
+            'message'=>'Archivo físico no existe',
+            'path'=>$path
+        ],404);
+
+    }
+
+
+    return response()->download($path);
+}
+
 
     /**
      * Display the specified resource.
@@ -76,7 +108,8 @@ class MediaFileController extends Controller
             $path = $this->UploadFile($request->file('file'), 'Documents');
 
             //upadate the file path in the database
-            $file->update(['path' => $path]);
+            $file->update(['name' => $request->file('file')->getClientOriginalName(),'path' => $path
+]);
         }
     }
 

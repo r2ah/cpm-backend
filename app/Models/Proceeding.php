@@ -11,7 +11,6 @@ class Proceeding extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
         'date',
         'address',
@@ -19,22 +18,21 @@ class Proceeding extends Model
         'approaches',
         'aggreements',
         'commission_id',
-        'signed_document',
         'elaborado_por',
     ];
 
-
     /**
-     * Documento firmado asociado al acta
+     * Documentos asociados al acta
      */
-    public function signedDocument(): BelongsTo
+    public function documents(): BelongsToMany
     {
-        return $this->belongsTo(
+        return $this->belongsToMany(
             MediaFiles::class,
-            'signed_document'
-        );
+            'proceeding_media_files',
+            'proceeding_id',
+            'media_file_id'
+        )->withTimestamps();
     }
-
 
     /**
      * Usuarios participantes del acta
@@ -49,9 +47,8 @@ class Proceeding extends Model
         )->withTimestamps();
     }
 
-
     /**
-     * Comisión a la que pertenece el acta
+     * Comisión
      */
     public function commission(): BelongsTo
     {
@@ -61,15 +58,14 @@ class Proceeding extends Model
         );
     }
 
-
     /**
      * Usuario que elaboró el acta
      */
     public function elaboradoPor(): BelongsTo
-{
-    return $this->belongsTo(
-        User::class,
-        'elaborado_por'
-    );
-}
+    {
+        return $this->belongsTo(
+            User::class,
+            'elaborado_por'
+        );
+    }
 }

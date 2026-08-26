@@ -10,6 +10,9 @@ use App\Http\Requests\StoreProceedingRequest;
 use App\Http\Requests\UpdateProceedingRequest;
 use App\Http\Resources\ProceedingResource;
 
+use App\Models\MediaFiles;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 class ProceedingController extends Controller
@@ -19,10 +22,11 @@ class ProceedingController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Proceeding::with([
+       $query = Proceeding::with([
     'participants',
     'commission',
-    'elaboradoPor'
+    'elaboradoPor',
+    'documents'
 ]);
 
 
@@ -58,52 +62,119 @@ public function store(StoreProceedingRequest $request): JsonResponse
 {
     $validated = $request->validated();
 
-   $elaborador = User::with('commissions')
-    ->find($validated['elaborado_por']);
+    /*
+    |--------------------------------------------------------------------------
+    | RELACIONES
+    |--------------------------------------------------------------------------
+    */
+
+    $documents = array_map(
+        'intval',
+        $validated['documents'] ?? []
+    );
+
+    $participants = array_map(
+        'intval',
+        $validated['participants'] ?? []
+    );
+
+    unset(
+        $validated['documents'],
+        $validated['participants']
+    );
 
 
-if (!$elaborador) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Usuario elaborador no encontrado.'
-    ], 422);
-}
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDAR ELABORADOR
+    |--------------------------------------------------------------------------
+    */
 
+    $elaborador = User::with('commissions')
+        ->find($validated['elaborado_por']);
 
-$commission = $elaborador->commissions->first();
-
-
-if (!$commission) {
-    return response()->json([
-        'success' => false,
-        'message' => 'El usuario seleccionado no pertenece a ninguna comisión.'
-    ], 422);
-}
-
-
-
-
-    $validated['commission_id'] = $commission->id;
-
-    $proceeding = Proceeding::create($validated);
-
-    if (!empty($validated['participants'])) {
-        $proceeding->participants()->attach($validated['participants']);
+    if (!$elaborador) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuario elaborador no encontrado.'
+        ], 422);
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OBTENER COMISIÓN DEL ELABORADOR
+    |--------------------------------------------------------------------------
+    */
+
+    $commission = $elaborador->commissions->first();
+
+    if (!$commission) {
+        return response()->json([
+            'success' => false,
+            'message' =>
+                'El usuario seleccionado no pertenece a ninguna comisión.'
+        ], 422);
+    }
+
+
+    $validated['commission_id'] =
+        $commission->id;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREAR ACTA
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding =
+        Proceeding::create($validated);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PARTICIPANTES
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding
+        ->participants()
+        ->sync($participants);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DOCUMENTOS
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding
+        ->documents()
+        ->sync($documents);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding->load([
+        'participants',
+        'commission',
+        'elaboradoPor',
+        'documents'
+    ]);
+
 
     return response()->json([
         'success' => true,
         'data' => new ProceedingResource(
-            $proceeding->load(
-    'participants',
-    'commission',
-    'elaboradoPor'
-)
+            $proceeding
         )
     ], 201);
 }
-
-
 
     /**
      * Display the specified resource.
@@ -111,11 +182,12 @@ if (!$commission) {
     public function show($id): JsonResponse
 {
     $proceeding = Proceeding::with([
-    'participants',
-    'elaboradoPor',
-    'signedDocument'
-])
-->find($id);
+        'participants',
+        'elaboradoPor',
+        'documents',
+        'commission'
+    ])
+    ->find($id);
 
 
     if (!$proceeding) {
@@ -154,43 +226,191 @@ if (!$commission) {
         ], 404);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Validar datos
+    |--------------------------------------------------------------------------
+    */
+
     $validated = $request->validated();
 
+\Log::info('DATOS UPDATE ACTA', [
+    'request_all' => $request->all(),
+    'validated' => $validated,
+    'documents' => $validated['documents'] ?? null,
+]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relaciones
+    |--------------------------------------------------------------------------
+    */
+
+    $documents = $validated['documents'] ?? [];
+    $participants = $validated['participants'] ?? [];
+
+    $documents = array_map('intval', $documents);
+    $participants = array_map('intval', $participants);
+
+    unset(
+        $validated['documents'],
+        $validated['participants']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validar usuario elaborador
+    |--------------------------------------------------------------------------
+    */
+
     $elaborador = User::with('commissions')
-    ->find($validated['elaborado_por']);
+        ->find($validated['elaborado_por']);
 
+    if (!$elaborador) {
 
-if (!$elaborador) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Usuario elaborador no encontrado.'
-    ], 422);
-}
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuario elaborador no encontrado.'
+        ], 422);
+    }
 
+    $commission = $elaborador->commissions->first();
 
-$commission = $elaborador->commissions->first();
+    if (!$commission) {
 
+        return response()->json([
+            'success' => false,
+            'message' => 'El usuario seleccionado no pertenece a ninguna comisión.'
+        ], 422);
+    }
 
-if (!$commission) {
-    return response()->json([
-        'success' => false,
-        'message' => 'El usuario seleccionado no pertenece a ninguna comisión.'
-    ], 422);
-}
+    $validated['commission_id'] = $commission->id;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Documentos antiguos
+    |--------------------------------------------------------------------------
+    */
 
-$validated['commission_id'] = $commission->id;
+    $oldDocuments = $proceeding
+        ->documents()
+        ->pluck('media_files.id')
+        ->map(fn ($id) => (int) $id)
+        ->toArray();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar acta
+    |--------------------------------------------------------------------------
+    */
 
     $proceeding->update($validated);
 
-    if ($request->has('participants')) {
-        $proceeding->participants()->sync($request->participants ?? []);
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar participantes
+    |--------------------------------------------------------------------------
+    */
+
+    $proceeding
+        ->participants()
+        ->sync($participants);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar documentos
+    |--------------------------------------------------------------------------
+    */
+ 
+    /*
+|--------------------------------------------------------------------------
+| Actualizar documentos
+|--------------------------------------------------------------------------
+*/
+
+\Log::info('ANTES SYNC DOCUMENTOS', [
+    'acta' => $proceeding->id,
+    'documents' => $documents,
+]);
+
+try {
+
+    $syncResult = $proceeding
+        ->documents()
+        ->sync($documents);
+
+    \Log::info('DESPUES SYNC DOCUMENTOS', [
+        'acta' => $proceeding->id,
+        'documents' => $documents,
+        'sync_result' => $syncResult,
+    ]);
+
+} catch (\Throwable $e) {
+
+    \Log::error('ERROR SYNC DOCUMENTOS', [
+        'acta' => $proceeding->id,
+        'documents' => $documents,
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+    ]);
+
+    throw $e;
+}
+    /*
+    |--------------------------------------------------------------------------
+    | Eliminar documentos que ya no pertenecen al acta
+    |--------------------------------------------------------------------------
+    */
+
+    $deletedDocuments = array_diff(
+        $oldDocuments,
+        $documents
+    );
+
+    foreach ($deletedDocuments as $documentId) {
+
+        $document = MediaFiles::find($documentId);
+
+        if (!$document) {
+            continue;
+        }
+
+        $usedElsewhere = DB::table('proceeding_media_files')
+            ->where('media_file_id', $documentId)
+            ->exists();
+
+        if (!$usedElsewhere) {
+
+            if ($document->path) {
+
+                Storage::delete(
+                    'public/' . $document->path
+                );
+            }
+
+            $document->delete();
+        }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Respuesta
+    |--------------------------------------------------------------------------
+    */
 
     return response()->json([
         'success' => true,
+
         'data' => new ProceedingResource(
-            $proceeding->fresh()->load('participants', 'commission')
+            $proceeding
+                ->fresh()
+                ->load([
+                    'participants',
+                    'commission',
+                    'elaboradoPor',
+                    'documents'
+                ])
         )
     ]);
 }

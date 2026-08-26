@@ -21,21 +21,77 @@ class UpdateProceedingRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+   public function rules(): array
 {
     return [
-        'date' => ['required', 'string'],
-        'address' => ['required', 'string'],
-        'agenda' => ['nullable', 'string'],
-        'approaches' => ['nullable', 'string'],
-        'aggreements' => ['nullable', 'string'],
 
-        'elaborado_por' => ['required', 'integer', 'exists:users,id'],
+        'date' => [
+            'required',
+            'string'
+        ],
 
-        'signed_document' => ['nullable', 'integer'],
+        'address' => [
+            'required',
+            'string'
+        ],
 
-        'participants' => ['nullable', 'array'],
-        'participants.*' => ['integer', 'exists:users,id'],
+        'agenda' => [
+            'nullable',
+            'string'
+        ],
+
+        'approaches' => [
+            'nullable',
+            'string'
+        ],
+
+        'aggreements' => [
+            'nullable',
+            'string'
+        ],
+
+
+        'elaborado_por' => [
+            'required',
+            'integer',
+            'exists:users,id'
+        ],
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DOCUMENTOS
+        |--------------------------------------------------------------------------
+        */
+
+        'documents' => [
+            'nullable',
+            'array'
+        ],
+
+        'documents.*' => [
+            'integer',
+            'exists:media_files,id'
+        ],
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PARTICIPANTES
+        |--------------------------------------------------------------------------
+        */
+
+        'participants' => [
+            'nullable',
+            'array'
+        ],
+
+        'participants.*' => [
+            'integer',
+            'exists:users,id'
+        ],
+
     ];
 }
 }

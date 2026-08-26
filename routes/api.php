@@ -15,6 +15,8 @@ use App\Http\Controllers\SITApiController;
 use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckUserActivity;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\PatrimonioController;
 
 
 use App\Http\Controllers\OpinionDocumentController;
@@ -42,22 +44,23 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::apiResource('authorities', AuthorityController::class);
-        Route::apiResource('people', PersonController::class);
-       
-        
-        
         
     
         Route::apiResource('commissions', CommissionController::class);
-        Route::apiResource('proceedings', ProceedingController::class);
+        
         
         Route::apiResource('interventions', InterventionController::class);
         Route::apiResource('opinions', OpinionController::class);
         Route::get('opinion-documents/{document}/download',[OpinionDocumentController::class,'download']) ->name('opinions.documents.download');
         Route::apiResource('users', UserController::class);
         Route::post('images/upload', [MediaFileController::class, 'store']);
+        Route::apiResource('proceedings', ProceedingController::class);
+        
+        Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
-   
+   Route::get('/patrimonio', [PatrimonioController::class, 'index']);
+   Route::apiResource('people', PersonController::class);
+   Route::apiResource('appointments', AppointmentController::class);
 });
 
 
