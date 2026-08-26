@@ -2,25 +2,25 @@
 
 namespace App\Notifications;
 
-use App\Models\Face2FaceCommissionRequest;
+use App\Models\Appointment;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class Face2FaceCommissionRequestNotification extends Notification implements ShouldQueue
+class AppointmentNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $face2face_commission_request;
+    protected $appointment;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Face2FaceCommissionRequest $face2face_commission_request)
+    public function __construct(Appointment $appointment)
     {
-        $this->face2face_commission_request = $face2face_commission_request;
+        $this->appointment = $appointment;
     }
 
     /**
