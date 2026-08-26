@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('general_characteristics')->nullable();
             $table->unsignedBigInteger('issuing_company');
             $table->enum('issuing_document_code', ['DUS', 'DO', 'Micro']); //TODO: Valorar si debe ser un nomenclador
+            $table->string('code', 255);
             $table->text('considerations')->nullable();
             $table->text('observations')->nullable();
             $table->enum('state', ['Elaborado', 'Revisado', 'Aprobado', 'Denegado'])->default('Elaborado');
