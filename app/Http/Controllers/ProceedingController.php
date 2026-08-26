@@ -62,11 +62,9 @@ public function store(StoreProceedingRequest $request): JsonResponse
 {
     $validated = $request->validated();
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELACIONES
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // RELACIONES
+    // =====================================================
 
     $documents = array_map(
         'intval',
@@ -78,17 +76,17 @@ public function store(StoreProceedingRequest $request): JsonResponse
         $validated['participants'] ?? []
     );
 
+    $location = $validated['location'] ?? null;
+
     unset(
         $validated['documents'],
-        $validated['participants']
+        $validated['participants'],
+        $validated['location']
     );
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDAR ELABORADOR
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // VALIDAR ELABORADOR
+    // =====================================================
 
     $elaborador = User::with('commissions')
         ->find($validated['elaborado_por']);
@@ -100,12 +98,9 @@ public function store(StoreProceedingRequest $request): JsonResponse
         ], 422);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | OBTENER COMISIÓN DEL ELABORADOR
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // OBTENER COMISIÓN DEL ELABORADOR
+    // =====================================================
 
     $commission = $elaborador->commissions->first();
 
@@ -117,48 +112,54 @@ public function store(StoreProceedingRequest $request): JsonResponse
         ], 422);
     }
 
+    $validated['commission_id'] = $commission->id;
 
-    $validated['commission_id'] =
-        $commission->id;
+    // =====================================================
+    // CREAR ACTA
+    // =====================================================
 
+    $proceeding = Proceeding::create($validated);
 
-    /*
-    |--------------------------------------------------------------------------
-    | CREAR ACTA
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // GUARDAR LOCALIZACIÓN POSTGIS
+    // =====================================================
 
-    $proceeding =
-        Proceeding::create($validated);
+    if ($location) {
 
+        DB::statement(
+            'UPDATE proceedings
+             SET location = ST_SetSRID(
+                 ST_MakePoint(?, ?),
+                 4326
+             )
+             WHERE id = ?',
+            [
+                $location['longitude'],
+                $location['latitude'],
+                $proceeding->id
+            ]
+        );
+    }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PARTICIPANTES
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // PARTICIPANTES
+    // =====================================================
 
     $proceeding
         ->participants()
         ->sync($participants);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | DOCUMENTOS
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // DOCUMENTOS
+    // =====================================================
 
     $proceeding
         ->documents()
         ->sync($documents);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESPUESTA
-    |--------------------------------------------------------------------------
-    */
+    // =====================================================
+    // RESPUESTA
+    // =====================================================
 
     $proceeding->load([
         'participants',
@@ -166,7 +167,6 @@ public function store(StoreProceedingRequest $request): JsonResponse
         'elaboradoPor',
         'documents'
     ]);
-
 
     return response()->json([
         'success' => true,
@@ -246,16 +246,20 @@ public function store(StoreProceedingRequest $request): JsonResponse
     |--------------------------------------------------------------------------
     */
 
-    $documents = $validated['documents'] ?? [];
-    $participants = $validated['participants'] ?? [];
+   $documents = $validated['documents'] ?? [];
+$participants = $validated['participants'] ?? [];
 
-    $documents = array_map('intval', $documents);
-    $participants = array_map('intval', $participants);
+$documents = array_map('intval', $documents);
+$participants = array_map('intval', $participants);
 
-    unset(
-        $validated['documents'],
-        $validated['participants']
-    );
+// Guardar temporalmente la ubicación
+$location = $validated['location'] ?? null;
+
+unset(
+    $validated['documents'],
+    $validated['participants'],
+    $validated['location']
+);
 
     /*
     |--------------------------------------------------------------------------
@@ -305,6 +309,27 @@ public function store(StoreProceedingRequest $request): JsonResponse
     */
 
     $proceeding->update($validated);
+
+    // =====================================================
+// ACTUALIZAR LOCALIZACIÓN POSTGIS
+// =====================================================
+
+if ($location) {
+
+    DB::statement(
+        'UPDATE proceedings
+         SET location = ST_SetSRID(
+             ST_MakePoint(?, ?),
+             4326
+         )
+         WHERE id = ?',
+        [
+            $location['longitude'],
+            $location['latitude'],
+            $proceeding->id
+        ]
+    );
+}
 
     /*
     |--------------------------------------------------------------------------

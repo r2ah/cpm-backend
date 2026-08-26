@@ -3,25 +3,42 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class ProceedingResource extends JsonResource
 {
     public function toArray($request): array
     {
         return [
-
             'id' => $this->id,
 
             'date' => $this->date,
-            'address' => $this->address,
-            'agenda' => $this->agenda,
-            'approaches' => $this->approaches,
-            'aggreements' => $this->aggreements,
 
+            'address' => $this->address,
+
+            'location' => $this->location
+                ? [
+                    'latitude' => (float) DB::selectOne(
+                        'SELECT ST_Y(?) AS latitude',
+                        [$this->location]
+                    )->latitude,
+
+                    'longitude' => (float) DB::selectOne(
+                        'SELECT ST_X(?) AS longitude',
+                        [$this->location]
+                    )->longitude,
+                ]
+                : null,
+
+            'agenda' => $this->agenda,
+
+            'approaches' => $this->approaches,
+
+            'aggreements' => $this->aggreements,
 
             'commission_id' => $this->commission_id,
 
-            'commission_name' => 
+            'commission_name' =>
                 $this->commission?->name,
 
 

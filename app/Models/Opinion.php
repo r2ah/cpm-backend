@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,35 +13,25 @@ class Opinion extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
-
         'entity',
         'address',
-
         'designer_id',
         'investor_id',
         'builder_id',
-
         'general_characteristics',
-
         'issuing_company',
         'issuing_document_code',
-
         'considerations',
         'observations',
-
         'state',
         'date',
-
         'commission_id',
-
         'prepared_by',
         'reviewed_by',
         'approved_by',
+        'location',
     ];
-
-
 
     public function designer(): BelongsTo
     {
@@ -52,7 +41,6 @@ class Opinion extends Model
         );
     }
 
-
     public function investor(): BelongsTo
     {
         return $this->belongsTo(
@@ -60,7 +48,6 @@ class Opinion extends Model
             'investor_id'
         );
     }
-
 
     public function builder(): BelongsTo
     {
@@ -70,7 +57,6 @@ class Opinion extends Model
         );
     }
 
-
     public function issuingCompany(): BelongsTo
     {
         return $this->belongsTo(
@@ -78,7 +64,6 @@ class Opinion extends Model
             'issuing_company'
         );
     }
-
 
     public function commission(): BelongsTo
     {
@@ -88,7 +73,6 @@ class Opinion extends Model
         );
     }
 
-
     public function preparedBy(): BelongsTo
     {
         return $this->belongsTo(
@@ -96,7 +80,6 @@ class Opinion extends Model
             'prepared_by'
         );
     }
-
 
     public function reviewedBy(): BelongsTo
     {
@@ -106,7 +89,6 @@ class Opinion extends Model
         );
     }
 
-
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(
@@ -114,21 +96,21 @@ class Opinion extends Model
             'approved_by'
         );
     }
+
     public function interventions(): BelongsToMany
-{
-    return $this->belongsToMany(
-        Intervention::class,
-        'intervention_opinion',
-        'opinion_id',
-        'intervention_id'
-    );
-}
+    {
+        return $this->belongsToMany(
+            Intervention::class,
+            'intervention_opinion',
+            'opinion_id',
+            'intervention_id'
+        );
+    }
 
-public function documents(): HasMany
-{
-    return $this->hasMany(
-        OpinionDocument::class
-    );
-}
-
+    public function documents(): HasMany
+    {
+        return $this->hasMany(
+            OpinionDocument::class
+        );
+    }
 }

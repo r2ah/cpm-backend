@@ -19,6 +19,7 @@ class Proceeding extends Model
         'aggreements',
         'commission_id',
         'elaborado_por',
+        'location',
     ];
 
     /**

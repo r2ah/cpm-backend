@@ -50,17 +50,18 @@ Route::prefix('v1')->group(function () {
         
         
         Route::apiResource('interventions', InterventionController::class);
-        Route::apiResource('opinions', OpinionController::class);
+        
         Route::get('opinion-documents/{document}/download',[OpinionDocumentController::class,'download']) ->name('opinions.documents.download');
         Route::apiResource('users', UserController::class);
         Route::post('images/upload', [MediaFileController::class, 'store']);
+        Route::apiResource('people', PersonController::class);
+        Route::apiResource('appointments', AppointmentController::class);
         Route::apiResource('proceedings', ProceedingController::class);
-        
+        Route::apiResource('opinions', OpinionController::class);
         Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
    Route::get('/patrimonio', [PatrimonioController::class, 'index']);
-   Route::apiResource('people', PersonController::class);
-   Route::apiResource('appointments', AppointmentController::class);
+   
 });
 
 

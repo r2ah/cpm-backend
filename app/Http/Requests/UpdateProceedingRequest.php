@@ -92,6 +92,26 @@ class UpdateProceedingRequest extends FormRequest
             'exists:users,id'
         ],
 
+        /**
+ * LOCALIZACIÓN
+ */
+'location' => [
+    'nullable',
+    'array'
+],
+
+'location.latitude' => [
+    'required_with:location',
+    'numeric',
+    'between:-90,90'
+],
+
+'location.longitude' => [
+    'required_with:location',
+    'numeric',
+    'between:-180,180'
+],
+
     ];
 }
 }
