@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Face2FaceCommissionRequest;
+use App\Models\Appointment;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -13,14 +13,14 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class Face2FaceCommissionRequestUpdated implements ShouldDispatchAfterCommit
+class AppointmentUpdated implements ShouldDispatchAfterCommit
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public Face2FaceCommissionRequest face2faceCommissionRequest)
+    public function __construct(public Appointment $appointment)
     {
         //
     }

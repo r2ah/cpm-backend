@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\Face2FaceCommissionRequestCreated;
+use App\Events\AppointmentCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -19,7 +19,7 @@ class SendFace2FaceCommissionRequestNotification
     /**
      * Handle the event.
      */
-    public function handle(Face2FaceCommissionRequestCreated $event): void
+    public function handle(AppointmentCreated $event): void
     {
         //
     }
