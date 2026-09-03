@@ -55,17 +55,29 @@ class OpinionResource extends JsonResource
             'designer' =>
                 $this->designer,
 
+            'designer_id' =>
+                $this->designer_id,
+
             'investor' =>
                 $this->investor,
 
+            'investor_id' =>
+                $this->investor_id,
+
             'builder' =>
                 $this->builder,
+
+            'builder_id' =>
+                $this->builder_id,
 
             'general_characteristics' =>
                 $this->general_characteristics,
 
             'issuing_company' =>
                 $this->issuingCompany,
+
+            'issuing_company_id' =>
+                $this->issuing_company,
 
             'issuing_document_code' =>
                 $this->issuing_document_code,
@@ -88,11 +100,20 @@ class OpinionResource extends JsonResource
             'prepared_by' =>
                 $this->preparedBy,
 
+            'prepared_by_id' =>
+                $this->prepared_by,
+
             'reviewed_by' =>
                 $this->reviewedBy,
 
+            'reviewed_by_id' =>
+                $this->reviewed_by,
+
             'approved_by' =>
                 $this->approvedBy,
+
+            'approved_by_id' =>
+                $this->approved_by,
 
             'interventions' =>
                 $this->interventions,

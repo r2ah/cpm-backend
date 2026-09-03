@@ -71,6 +71,10 @@ class PatrimonioController extends Controller
                 }
             );
 
+            if ($records === []) {
+                Cache::forget('patrimonio_entidades_patrimoniales');
+            }
+
 
             if (!is_array($records)) {
 
@@ -317,32 +321,32 @@ class PatrimonioController extends Controller
                         ]
                     );
 
-                    break;
-                }
+                    $records = $this->obtenerPatrimonioLocal();
 
+                    if ($records === []) {
+                        break;
+                    }
 
-                /*
-                 * --------------------------------------------------
-                 * DECODIFICAR RESPUESTA
-                 * --------------------------------------------------
-                 */
-
-                $data =
-                    $this->decodificarRespuesta(
+                    $data = [
+                        'data' => [
+                            'records' => $records,
+                        ],
+                    ];
+                } else {
+                    $data = $this->decodificarRespuesta(
                         $response->body()
                     );
 
+                    if (!is_array($data)) {
+                        Log::error(
+                            'Plan Maestro devolvió JSON inválido para Patrimonio.',
+                            [
+                                'page' => $page,
+                            ]
+                        );
 
-                if (!is_array($data)) {
-
-                    Log::error(
-                        'Plan Maestro devolvió JSON inválido para Patrimonio.',
-                        [
-                            'page' => $page,
-                        ]
-                    );
-
-                    break;
+                        break;
+                    }
                 }
 
 
@@ -352,9 +356,10 @@ class PatrimonioController extends Controller
                  * --------------------------------------------------
                  */
 
-                $records =
-                    $data['data']['records']
-                    ?? [];
+                $records = $data['data']['records']
+                    ?? (is_array($data['data'] ?? null)
+                        ? $data['data']
+                        : []);
 
 
                 if (!is_array($records)) {
@@ -462,18 +467,23 @@ class PatrimonioController extends Controller
                         $codigoInmueble !== null &&
                         $codigoInmueble !== ''
                     ) {
-
                         $imagenes =
                             $imagenesPorCodigo[
                                 $codigoInmueble
                             ]
                             ?? [];
 
-
                         $imagenRepresentativa =
                             $this->seleccionarImagenRepresentativa(
                                 $imagenes
                             );
+
+                        $record['imagenes'] =
+                            $this->normalizarUrlsColeccion(
+                                $imagenes
+                            );
+                    } else {
+                        $record['imagenes'] = [];
                     }
 
 
@@ -656,411 +666,44 @@ class PatrimonioController extends Controller
      */
     private function obtenerBancoImagenes(): array
     {
-        $imagenesPorCodigo = [];
-
-
-        $page = 1;
-
-        $limit = 100;
-
-        $maxPages = 2000;
-
-
         /*
-         * CONTADORES
+         * La sincronización total del banco de imágenes de todos los
+         * inmuebles es demasiado costosa y puede exceder el tiempo de
+         * ejecución del request. Para este flujo, la carga se hace por
+         * código al abrir el modal, evitando timeouts y manteniendo el
+         * endpoint de listado ligero.
          */
-
-        $totalImagenes = 0;
-
-        $totalImagenesValidas = 0;
-
-
-        while ($page <= $maxPages) {
-
-            try {
-
-                $response = Http::timeout(30)
-                    ->retry(
-                        2,
-                        500
-                    )
-                    ->get(
-                        "{$this->baseUrl}/Entidades",
-                        [
-                            'operation' =>
-                                'getData',
-
-                            'entidad' =>
-                                'Banco_de_Imagenes',
-
-                            'limit' =>
-                                $limit,
-
-                            'page' =>
-                                $page,
-                        ]
-                    );
-
-
-                /*
-                 * --------------------------------------------------
-                 * ERROR HTTP
-                 * --------------------------------------------------
-                 */
-
-                if ($response->failed()) {
-
-                    Log::error(
-                        'Error consultando Banco_de_Imagenes.',
-                        [
-                            'page' =>
-                                $page,
-
-                            'status' =>
-                                $response->status(),
-
-                            'body' =>
-                                substr(
-                                    $response->body(),
-                                    0,
-                                    1000
-                                ),
-                        ]
-                    );
-
-                    break;
-                }
-
-
-                /*
-                 * --------------------------------------------------
-                 * DECODIFICAR
-                 * --------------------------------------------------
-                 */
-
-                $data =
-                    $this->decodificarRespuesta(
-                        $response->body()
-                    );
-
-
-                if (!is_array($data)) {
-
-                    Log::error(
-                        'JSON inválido de Banco_de_Imagenes.',
-                        [
-                            'page' =>
-                                $page,
-                        ]
-                    );
-
-                    break;
-                }
-
-
-                /*
-                 * --------------------------------------------------
-                 * RECORDS
-                 * --------------------------------------------------
-                 */
-
-                $records =
-                    $data['data']['records']
-                    ?? [];
-
-
-                if (!is_array($records)) {
-
-                    $records = [];
-
-                }
-
-
-                /*
-                 * --------------------------------------------------
-                 * NO HAY RECORDS
-                 * --------------------------------------------------
-                 */
-
-                if (empty($records)) {
-                    break;
-                }
-
-
-                /*
-                 * --------------------------------------------------
-                 * INDEXAR
-                 * --------------------------------------------------
-                 */
-
-                foreach ($records as $imagen) {
-
-                    if (!is_array($imagen)) {
-                        continue;
-                    }
-
-
-                    $totalImagenes++;
-
-
-                    /*
-                     * ------------------------------------------------
-                     * METADATA
-                     * ------------------------------------------------
-                     */
-
-                    $metadata =
-                        $imagen['metadata']
-                        ?? [];
-
-
-                    if (!is_array($metadata)) {
-
-                        $metadata = [];
-
-                    }
-
-
-                    /*
-                     * ------------------------------------------------
-                     * CÓDIGO
-                     * ------------------------------------------------
-                     *
-                     * JSON real:
-                     *
-                     * metadata.codigo_inmueble
-                     *
-                     * También:
-                     *
-                     * metadata.codigo
-                     */
-
-                    $codigo =
-                        $metadata['codigo_inmueble']
-                        ?? $metadata['codigo']
-                        ?? null;
-
-
-                    if (
-                        $codigo === null ||
-                        trim((string) $codigo) === ''
-                    ) {
-
-                        continue;
-                    }
-
-
-                    $codigo =
-                        trim(
-                            (string) $codigo
-                        );
-
-
-                    /*
-                     * ------------------------------------------------
-                     * URL
-                     * ------------------------------------------------
-                     */
-
-                    $url =
-                        $imagen['url']
-                        ?? [];
-
-
-                    if (!is_array($url)) {
-
-                        continue;
-                    }
-
-
-                    /*
-                     * ------------------------------------------------
-                     * NORMALIZAR URLS
-                     * ------------------------------------------------
-                     */
-
-                    $url =
-                        $this->normalizarUrlsImagen(
-                            $url
-                        );
-
-
-                    /*
-                     * ------------------------------------------------
-                     * VERIFICAR URL
-                     * ------------------------------------------------
-                     */
-
-                    if (empty($url)) {
-
-                        continue;
-                    }
-
-
-                    /*
-                     * Guardamos la estructura original
-                     * completa.
-                     */
-
-                    $imagen['url'] =
-                        $url;
-
-
-                    /*
-                     * ------------------------------------------------
-                     * CREAR ÍNDICE
-                     * ------------------------------------------------
-                     */
-
-                    if (
-                        !isset(
-                            $imagenesPorCodigo[$codigo]
-                        )
-                    ) {
-
-                        $imagenesPorCodigo[$codigo] =
-                            [];
-                    }
-
-
-                    $imagenesPorCodigo[$codigo][] =
-                        $imagen;
-
-
-                    $totalImagenesValidas++;
-                }
-
-
-                /*
-                 * --------------------------------------------------
-                 * SIGUIENTE PÁGINA
-                 * --------------------------------------------------
-                 */
-
-                $nextPage =
-                    $data['data']['nextpage']
-                    ?? null;
-
-
-                if (
-                    $nextPage === null ||
-                    $nextPage === false ||
-                    $nextPage === ''
-                ) {
-
-                    $totalPageApi =
-                        (int) (
-                            $data['data']['totalpage']
-                            ?? 0
-                        );
-
-
-                    if (
-                        $totalPageApi > $page
-                    ) {
-
-                        $page++;
-
-                        continue;
-                    }
-
-
-                    break;
-                }
-
-
-                $nextPage =
-                    (int) $nextPage;
-
-
-                if (
-                    $nextPage <= $page
-                ) {
-
-                    break;
-                }
-
-
-                $page =
-                    $nextPage;
-
-
-            } catch (\Throwable $e) {
-
-                Log::error(
-                    'Error obteniendo Banco_de_Imagenes.',
-                    [
-                        'page' =>
-                            $page,
-
-                        'message' =>
-                            $e->getMessage(),
-                    ]
-                );
-
-                break;
-            }
+        return [];
+    }
+
+    private function obtenerPatrimonioLocal(): array
+    {
+        $path = base_path('patrimonio_api.json');
+
+        if (!is_file($path)) {
+            return [];
         }
 
+        $raw = (string) file_get_contents($path);
 
-        /*
-         * --------------------------------------------------
-         * LOG
-         * --------------------------------------------------
-         */
-
-        Log::info(
-            'Banco de imágenes cargado.',
-            [
-                'paginas_consultadas' =>
-                    $page,
-
-                'imagenes_api' =>
-                    $totalImagenes,
-
-                'imagenes_validas' =>
-                    $totalImagenesValidas,
-
-                'inmuebles_con_imagenes' =>
-                    count(
-                        $imagenesPorCodigo
-                    ),
-            ]
-        );
-
-
-        /*
-         * --------------------------------------------------
-         * DEBUG DEL PRIMER CÓDIGO
-         * --------------------------------------------------
-         */
-
-        if (!empty($imagenesPorCodigo)) {
-
-            $primerCodigo =
-                array_key_first(
-                    $imagenesPorCodigo
-                );
-
-
-            Log::info(
-                'Ejemplo de índice de imágenes.',
-                [
-                    'codigo' =>
-                        $primerCodigo,
-
-                    'cantidad' =>
-                        count(
-                            $imagenesPorCodigo[
-                                $primerCodigo
-                            ]
-                        ),
-                ]
-            );
+        if (str_starts_with($raw, "\xFF\xFE")) {
+            $raw = mb_convert_encoding($raw, 'UTF-8', 'UTF-16LE');
+        } elseif (str_starts_with($raw, "\xFE\xFF")) {
+            $raw = mb_convert_encoding($raw, 'UTF-8', 'UTF-16BE');
         }
 
+        $data = $this->decodificarRespuesta($raw);
 
-        return $imagenesPorCodigo;
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $payload = $data['data'] ?? $data;
+
+        $records = $payload['records']
+            ?? (is_array($payload) ? $payload : []);
+
+        return is_array($records) ? $records : [];
     }
 
 
@@ -1650,6 +1293,98 @@ class PatrimonioController extends Controller
 }
 
     /**
+     * Aplana la colección de imágenes por inmueble
+     * para devolver una lista de URLs válidas.
+     */
+    private function normalizarUrlsColeccion(array $imagenes): array
+    {
+        $resultado = [];
+
+        foreach ($imagenes as $imagen) {
+            if (!is_array($imagen)) {
+                continue;
+            }
+
+            $urls = $imagen['url'] ?? [];
+
+            if (is_string($urls)) {
+                $urls = [$urls];
+            }
+
+            if (!is_array($urls)) {
+                continue;
+            }
+
+            foreach ($urls as $valor) {
+                if (!is_string($valor)) {
+                    continue;
+                }
+
+                $valor = trim($valor);
+
+                if ($valor === '') {
+                    continue;
+                }
+
+                $valor = str_replace(' ', '%20', $valor);
+                $valor = str_replace('%2520', '%20', $valor);
+                $resultado[] = $valor;
+            }
+        }
+
+        $resultado = array_values(
+            array_unique(
+                array_filter(
+                    $resultado,
+                    fn ($url) => is_string($url) && $url !== '' && str_starts_with($url, 'http')
+                )
+            )
+        );
+
+        return $resultado;
+    }
+
+    /**
+     * Normaliza y aplanas una colección de URLs que puede venir
+     * como objeto asociativo o como array anidado.
+     */
+    private function normalizarUrlsDesdeObjeto(mixed $valor): array
+    {
+        if ($valor === null) {
+            return [];
+        }
+
+        if (is_string($valor)) {
+            $valor = [$valor];
+        }
+
+        if (!is_array($valor)) {
+            return [];
+        }
+
+        $resultado = [];
+        foreach ($valor as $item) {
+            if (is_array($item)) {
+                $resultado = [...$resultado, ...$this->normalizarUrlsDesdeObjeto($item)];
+                continue;
+            }
+
+            if (!is_string($item)) {
+                continue;
+            }
+
+            $item = trim($item);
+            if ($item === '' || !str_starts_with($item, 'http')) {
+                continue;
+            }
+
+            $resultado[] = str_replace('%2520', '%20', str_replace(' ', '%20', $item));
+        }
+
+        return array_values(array_unique($resultado));
+    }
+
+    /**
      * ==========================================================
      * DECODIFICAR RESPUESTA
      * ==========================================================
@@ -1747,6 +1482,78 @@ class PatrimonioController extends Controller
         return $data;
     }
 
+
+    /**
+     * Devuelve las imágenes de un inmueble por su código.
+     * Se usa desde el modal para consultar solo el inmueble seleccionado.
+     */
+    public function imagenesPorCodigo(Request $request): JsonResponse
+    {
+        $codigo = trim((string) ($request->query('codigo') ?? ''));
+
+        if ($codigo === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Debe indicar el código del inmueble.',
+                'data' => [],
+            ], 400);
+        }
+
+        try {
+            $response = Http::timeout(20)
+                ->retry(2, 500)
+                ->get("{$this->baseUrl}/Banco_de_Imagenes", [
+                    'operation' => 'getData',
+                    'codigo' => $codigo,
+                ]);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo consultar las imágenes del inmueble.',
+                    'data' => [],
+                ], $response->status() >= 400 ? $response->status() : 500);
+            }
+
+            $data = $this->decodificarRespuesta($response->body());
+            $records = $data['data']['records'] ?? [];
+
+            if (!is_array($records)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                ]);
+            }
+
+            $urls = [];
+            foreach ($records as $record) {
+                if (!is_array($record)) {
+                    continue;
+                }
+
+                $flat = $this->normalizarUrlsDesdeObjeto($record['url'] ?? []);
+                foreach ($flat as $url) {
+                    $urls[] = $url;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => array_values(array_unique($urls)),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error consultando imágenes por código.', [
+                'codigo' => $codigo,
+                'message' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno al consultar imágenes.',
+                'data' => [],
+            ], 500);
+        }
+    }
 
     /**
      * ==========================================================

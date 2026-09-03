@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProceedingResource extends JsonResource
 {
@@ -55,6 +56,9 @@ class ProceedingResource extends JsonResource
                 'id' => $file->id,
                 'name' => $file->name,
                 'path' => $file->path,
+                'size' => Storage::disk('public')->exists($file->path)
+                    ? Storage::disk('public')->size($file->path)
+                    : null,
                 'url' => asset('storage/' . $file->path),
             ];
 

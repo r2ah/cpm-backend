@@ -52,7 +52,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('interventions', InterventionController::class);
         
         Route::get('opinion-documents/{document}/download',[OpinionDocumentController::class,'download']) ->name('opinions.documents.download');
-        Route::apiResource('users', UserController::class);
+        
         Route::post('images/upload', [MediaFileController::class, 'store']);
         Route::apiResource('people', PersonController::class);
         Route::apiResource('appointments', AppointmentController::class);
@@ -60,8 +60,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('opinions', OpinionController::class);
         Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
+    Route::apiResource('users', UserController::class);
    Route::get('/patrimonio', [PatrimonioController::class, 'index']);
-   
+    Route::get('/patrimonio/imagenes', [PatrimonioController::class, 'imagenesPorCodigo']);
 });
 
 
