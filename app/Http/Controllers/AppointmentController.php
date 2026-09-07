@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -68,6 +69,14 @@ class AppointmentController extends Controller
                 'in:pendiente,confirmada,cancelada,atendida',
             ],
         ]);
+
+        if (Carbon::parse($validated['date'])->isWeekend()) {
+            throw ValidationException::withMessages([
+                'date' => [
+                    'No se pueden agendar citas los sábados ni domingos.',
+                ],
+            ]);
+        }
 
         /*
          * Comprobar que la comisión no tenga
@@ -167,6 +176,14 @@ class AppointmentController extends Controller
 
         $time = $validated['time']
             ?? $appointment->time;
+
+        if (Carbon::parse($date)->isWeekend()) {
+            throw ValidationException::withMessages([
+                'date' => [
+                    'No se pueden agendar citas los sábados ni domingos.',
+                ],
+            ]);
+        }
 
         /*
          * Comprobar que la comisión no tenga

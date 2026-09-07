@@ -12,7 +12,7 @@ class CheckUserActivity
     /**
      * Tiempo máximo de inactividad en minutos.
      */
-    const TIMEOUT = 15;
+    const TIMEOUT =15;
 
     /**
      * Handle an incoming request.
@@ -27,7 +27,7 @@ class CheckUserActivity
 
             if (
                 $lastActivity &&
-                Carbon::parse($lastActivity)->diffInMinutes(now()) >= self::TIMEOUT
+                Carbon::parse($lastActivity)->diffInRealMinutes(now()) >= self::TIMEOUT
             ) {
 
                 // Eliminar el token actual si existe
@@ -41,9 +41,6 @@ class CheckUserActivity
             }
         }
 
-        // Ejecutar la petición
-        $response = $next($request);
-
         // Actualizar la última actividad del usuario
         if ($user) {
             $user->update([
@@ -51,6 +48,6 @@ class CheckUserActivity
             ]);
         }
 
-        return $response;
+        return $next($request);
     }
 }
