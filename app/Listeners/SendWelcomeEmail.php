@@ -2,13 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\OpinionStateChanged;
-use App\Notification\OpinionStateChangeNotification;
-
+use App\Events\UserRegistered;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class LogOpinionStateChange implements ShouldQueue
+class SendWelcomeEmail implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -23,8 +21,8 @@ class LogOpinionStateChange implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(OpinionStateChanged $event): void
+    public function handle(UserRegistered $event): void
     {
-        //Notification::send($users, new OpinionStateChangeNotification($event->opinion));
+        Mail::to($event->user->email)->send(new WelcomeEmail($event->user));
     }
 }

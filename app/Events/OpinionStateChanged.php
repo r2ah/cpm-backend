@@ -17,12 +17,14 @@ class OpinionStateChanged implements ShouldDispatchAfterCommit
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    protected $opinion;
+
     /**
      * Create a new event instance.
      */
     public function __construct(public Opinion $opinion)
     {
-        //
+        $this->opinion = opinion;
     }
 
     /**

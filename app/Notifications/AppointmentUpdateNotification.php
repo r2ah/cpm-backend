@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AppointmentNotification extends Notification implements ShouldQueue
+class AppointmentUpdateNotification extends Notification
 {
     use Queueable;
 
@@ -30,7 +30,7 @@ class AppointmentNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-	return ['mail', 'database'];
+        return ['mail', 'database'];
     }
 
     /**

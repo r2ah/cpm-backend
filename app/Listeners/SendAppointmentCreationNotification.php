@@ -3,11 +3,16 @@
 namespace App\Listeners;
 
 use App\Events\AppointmentCreated;
+use App\Notification\AppointmentCreationNotification;
+
+use App\Events\AppointmentCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SendFace2FaceCommissionRequestNotification
+class SendAppointmentNotification implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Create the event listener.
      */
@@ -21,6 +26,6 @@ class SendFace2FaceCommissionRequestNotification
      */
     public function handle(AppointmentCreated $event): void
     {
-        //
+        //Notification::send($users, new AppointmentCreationNotification($event->opinion));
     }
 }

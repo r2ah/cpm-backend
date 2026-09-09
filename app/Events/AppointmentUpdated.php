@@ -17,12 +17,14 @@ class AppointmentUpdated implements ShouldDispatchAfterCommit
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    protected $appointment;
+
     /**
      * Create a new event instance.
      */
     public function __construct(public Appointment $appointment)
     {
-        //
+        $this->appointment = $appointment;
     }
 
     /**
