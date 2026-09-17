@@ -25,14 +25,21 @@ class StoreAuthorityRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')],
-            'email' => ['string', 'email', 'max:255']
+            'email' => [
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('authorities', 'email'),
+            ],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.unique' => __('Esta Autoridad ya existe.')
+            'name.unique' => __('Esta Autoridad ya existe.'),
+            'email.unique' => __('Ese correo ya se está usando.')
         ];
     }
 }

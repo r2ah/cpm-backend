@@ -24,15 +24,31 @@ class UpdateAuthorityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'min:3', 'max:100', Rule::unique(table: 'authorities', column: 'name')->ignore(id: request('authorities'), idColumn: 'id')],
-            'email' => ['sometimes', 'string', 'email', 'max:255']
+            'name' => [
+                'sometimes',
+                'string',
+                'min:3',
+                'max:100',
+                Rule::unique('authorities', 'name')
+                    ->ignore($this->route('authority')->id),
+            ],
+            'email' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('authorities', 'email')
+                    ->ignore($this->route('authority')->id),
+            ],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.unique' => __('Esta Autoridad ya existe.')
+            'name.unique' => __('Esta Autoridad ya existe.'),
+            'email.unique' => __('Ese correo ya se está usando.')
         ];
     }
 }
