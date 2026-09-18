@@ -22,6 +22,7 @@ class Opinion extends Model
         'general_characteristics',
         'issuing_company',
         'issuing_document_code',
+        'document_folio',
         'considerations',
         'observations',
         'state',

@@ -20,7 +20,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return true;
+        return $user->hasRole('admin') || $user->is($model);
     }
 
     /**
@@ -28,13 +28,13 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-	return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 
     /** * Determine whether the user can update the model. */
     public function update(User $user, User $model): bool
     {
-	return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 
     /**
@@ -42,7 +42,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-	return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 
     /**
@@ -50,7 +50,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-	return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 
     /**
@@ -58,6 +58,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-	return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 }

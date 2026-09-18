@@ -24,14 +24,20 @@ class CheckUserActivity
         if ($user) {
 
             $lastActivity = $user->last_activity;
+            $token = $user->currentAccessToken();
+            $tokenCreatedAt = $token?->created_at;
 
             if (
+                $token &&
                 $lastActivity &&
+                Carbon::parse($lastActivity)->isPast() &&
                 Carbon::parse($lastActivity)->diffInRealMinutes(now()) >= self::TIMEOUT
+                && $tokenCreatedAt
+                && Carbon::parse($tokenCreatedAt)->diffInRealMinutes(now()) >= self::TIMEOUT
             ) {
 
                 // Eliminar el token actual si existe
-                if ($token = $user->currentAccessToken()) {
+                if ($token) {
                     $token->delete();
                 }
 

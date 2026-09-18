@@ -76,6 +76,12 @@ class StoreOpinionRequest extends FormRequest
             'in:DUS,DO,Micro'
         ],
 
+        'document_folio'=>[
+            'nullable',
+            'string',
+            'max:255'
+        ],
+
 
         'considerations'=>[
             'nullable',

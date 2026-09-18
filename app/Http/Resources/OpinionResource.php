@@ -82,6 +82,9 @@ class OpinionResource extends JsonResource
             'issuing_document_code' =>
                 $this->issuing_document_code,
 
+            'document_folio' =>
+                $this->document_folio,
+
             'considerations' =>
                 $this->considerations,
 
@@ -158,4 +161,3 @@ class OpinionResource extends JsonResource
         ];
     }
 }
-

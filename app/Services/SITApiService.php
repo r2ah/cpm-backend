@@ -13,18 +13,30 @@ class SITApiService
 
 	public function __construct()
 	{
-		$this->baseUrl = config('services.api.pm.base_url');
-		$this->apiKey = config('services.api.pm.key');
+		$this->baseUrl = rtrim((string) config('services.api.pm.base_url'), '/');
+		$this->apiKey = (string) config('services.api.pm.key', '');
 	}
 
-    public function getEntities(string $codigo, string $entidad, string $filter, int $limit, int $page): array
+	private function decodeResponse($response): array
+	{
+		$body = preg_replace('/^\xEF\xBB\xBF/', '', $response->body());
+		$data = json_decode($body, true);
+
+		if (!is_array($data)) {
+		    throw new \Exception('Invalid response from SIT API');
+		}
+
+		return $data;
+	}
+
+    public function getEntities(?string $codigo, ?string $entidad, string $filter, int $limit, int $page): array
     {
 		$params = [
                 'codigo' => $codigo,
         ];
 
 		if($codigo) {
-			$cache_key = Hash::make("entity:{$codigo}");
+			$cache_key = Hash::make("entities:{$codigo},{$entidad}");
 		} else {
 			$cache_key = Hash::make("entities:{$entidad},filter:{$filter},limit:{$limit},page:{$page}");
 
@@ -37,44 +49,46 @@ class SITApiService
 		}
 
         return Cache::remember($cache_key, 1800, function () use ($params) {
-            $response = Http::get("{$this->baseUrl}/Entidades?operation=getData", $params);
+            $url = "{$this->baseUrl}/Entidades?operation=getData&" . http_build_query($params);
+            $response = Http::connectTimeout(5)
+                ->timeout(10)
+                ->get($url);
 
             if ($response->failed()) {
                 throw new \Exception('SIT API service unavailable');
             }
 
-            return $response->json()->toArray();
+            return $this->decodeResponse($response);
         });
     }
 
-    public function getIncriptions(string $codigo, string $folio, string $nombre, string $filter, int $limit, int $page): array
+    public function getIncriptions(?string $codigo, string $folio, ?string $nombre, string $filter, int $limit, int $page): array
     {
 		$params = [
-                'codigo' => $codigo,
-        ];
+		        'codigo' => $codigo,
+		];
 
 		if($codigo) {
-			$cache_key = Hash::make("entity:{$codigo}");
+			$cache_key = Hash::make("inscriptions:{$codigo},folio:{$folio}");
 		} else {
 			$cache_key = Hash::make("inscriptions:{$folio},name:{$nombre},filter:{$filter},limit:{$limit},page:{$page}");
 
 			$params = [
-                'folio' => $folio,
-                'nombre' => $nombre,
-                'filter' => $filter,
-                'limit' => $limit,
-				'page' => $page,
-            ];
+		        'folio' => $folio,
+		    ];
 		}
 
         return Cache::remember($cache_key, 1800, function () use ($params) {
-            $response = Http::get("{$this->baseUrl}/Inscripciones?operation=getData", $params);
+            $url = "{$this->baseUrl}/Inscripciones?operation=getData&" . http_build_query($params);
+            $response = Http::connectTimeout(5)
+                ->timeout(10)
+                ->get($url);
 
             if ($response->failed()) {
                 throw new \Exception('SIT API service unavailable');
             }
 
-            return $response->json()->toArray();
+            return $this->decodeResponse($response);
         });
     }	
 }

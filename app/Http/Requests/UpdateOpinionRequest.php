@@ -41,6 +41,8 @@ class UpdateOpinionRequest extends FormRequest
 
         'issuing_document_code'=>'sometimes|in:DUS,DO,Micro',
 
+        'document_folio'=>'sometimes|nullable|string|max:255',
+
         'considerations'=>'nullable|string',
 
         'observations'=>'nullable|string',

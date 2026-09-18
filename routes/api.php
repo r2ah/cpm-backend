@@ -28,9 +28,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::prefix('plan-maestro')->group(function () {
-        Route::get('/', [SITApiController::class, 'index']);
-        Route::get('/entities', [SITApiController::class, 'getEntities']);
-        Route::get('/inscriptions', [SITApiController::class, 'getInscriptions']);
+        Route::get('/', [SITApiController::class, 'show']);
+        Route::get('/entities', [SITApiController::class, 'show']);
+        Route::get('/inscriptions', [SITApiController::class, 'show']);
     });
 
     Route::middleware([
@@ -41,7 +41,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::get('/user', function (Request $request) {
-            return response()->json($request->user(), 200);
+            return response()->json([
+                'success' => true,
+                'data' => new \App\Http\Resources\UserResource(
+                    $request->user()->load('commissions')
+                ),
+            ], 200);
         });
 
         Route::apiResource('authorities', AuthorityController::class);
@@ -57,6 +62,8 @@ Route::prefix('v1')->group(function () {
         Route::post('images/upload', [MediaFileController::class, 'store']);
         Route::apiResource('people', PersonController::class);
         Route::apiResource('appointments', AppointmentController::class);
+        Route::patch('users/password', [UserController::class, 'updatePassword']);
+        Route::apiResource('users', UserController::class);
         Route::get('/gis/layers/{layer}', [GisController::class, 'layer']);
         Route::get('/gis/buildings/{code}', [GisController::class, 'building']);
         Route::apiResource('proceedings', ProceedingController::class);
@@ -64,7 +71,6 @@ Route::prefix('v1')->group(function () {
         Route::get('media-files/{file}/download',[MediaFileController::class, 'download'])->name('media-files.download');
     });
     
-    Route::apiResource('users', UserController::class);
    Route::get('/patrimonio', [PatrimonioController::class, 'index']);
     Route::get('/patrimonio/imagenes', [PatrimonioController::class, 'imagenesPorCodigo']);
 });

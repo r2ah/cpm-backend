@@ -13,12 +13,14 @@ use App\Actions\Fortify\PasswordValidationRules;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Gate;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\UpdateUserPasswordRequest;
 class UserController extends Controller
 {
     /**
@@ -26,9 +28,9 @@ class UserController extends Controller
      */
     public function index(Request $request) : JsonResponse
 {
-    $users = User::with([
-    'commissions'
-])->latest()->get();
+    $users = $request->user()->hasRole('admin')
+        ? User::with('commissions')->latest()->get()
+        : collect([$request->user()->load('commissions')]);
 
     return response()->json([
         'success' => true,
@@ -43,6 +45,7 @@ class UserController extends Controller
 
 public function store(UserRequest $request)
 {
+    Gate::forUser($request->user())->authorize('create', User::class);
     $validated = $request->validated();
 
     $user = User::create([
@@ -93,6 +96,7 @@ public function store(UserRequest $request)
      */
   public function update(UserRequest $request, User $user)
 {
+    Gate::forUser($request->user())->authorize('update', $user);
     $validated = $request->validated();
     logger()->info('DATOS UPDATE USER', $validated);
 
@@ -150,11 +154,26 @@ public function store(UserRequest $request)
      */
     public function destroy(User $user) : JsonResponse
     {
+        Gate::forUser(request()->user())->authorize('delete', $user);
         $user->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'User deleted successfully'
         ], 200);
+    }
+
+    public function updatePassword(UpdateUserPasswordRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contraseña actualizada correctamente.',
+        ]);
     }
 }

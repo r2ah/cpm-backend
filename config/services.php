@@ -37,7 +37,7 @@ return [
 
     'api' => [
         'pm' => [
-            'base_url' => env('API_PM_BASE_URL'),
+            'base_url' => env('API_PM_BASE_URL', 'http://apps.planmaestro.ohc.cu/Servicio/v1'),
             'key' => env('API_PM_KEY'),
         ],
     ],
