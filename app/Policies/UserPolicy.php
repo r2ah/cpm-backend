@@ -42,7 +42,11 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasRole('admin');
+        if (!$user->hasRole('admin') || $user->is($model)) {
+            return false;
+        }
+
+        return !$model->hasRole('admin') || User::role('admin')->count() > 1;
     }
 
     /**

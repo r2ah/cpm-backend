@@ -106,8 +106,9 @@ class StoreProceedingRequest extends FormRequest
             */
 
             'participants' => [
-                'nullable',
-                'array'
+                'required',
+                'array',
+                'min:1'
             ],
 
             'participants.*' => [
